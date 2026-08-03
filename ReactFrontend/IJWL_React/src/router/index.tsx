@@ -1,8 +1,8 @@
 import Root from "../Root";
 import { createBrowserRouter } from "react-router-dom";
-import Home from "../Home";
-import Login from "../Login";
-import Register from "../Register";
+import Home from "../screens/Home";
+import Login from "../screens/Login";
+import Register from "../screens/Register";
 import Homepage from "../RightSideMainView/Homepage";
 import Learning from "../RightSideMainView/Learning";
 import MyProfile from "../RightSideMainView/MyProfile";
@@ -68,3 +68,5 @@ const router = createBrowserRouter([
         ],
     },
 ]);
+
+export default router;
