@@ -1,7 +1,12 @@
-import React, { useState } from 'react';
-import { Button, Layout, Menu, theme, Avatar } from 'antd';
-import { Outlet,useLocation, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Button, Layout, Menu, theme, Avatar, ConfigProvider } from 'antd';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useUserStatusStore } from '../stores/useUserStatusStore';
+import { useWordListStatusStore } from '../stores/useWordListStatusStore';
+import '../css/Home.css';
+import { Input, } from 'antd';
+import type { GetProps } from 'antd';
+import axios from 'axios';
 
 // 导入图标
 import {
@@ -33,6 +38,39 @@ const avatarIconMap: Record<AvatarType, React.ReactNode> = {
 
 const { Header, Sider, Content } = Layout;
 
+type SearchProps = GetProps<typeof Input.Search>;
+
+const { Search } = Input;
+
+const onSearch: SearchProps['onSearch'] = (value, _e, info) => console.log(info?.source, value);
+
+
+const SearchBar: React.FC = () => {
+    const location = useLocation();
+    const shouldShowSearch =
+        location.pathname === '/wordlist' ||
+        location.pathname === '/testresult' ||
+        location.pathname === '/learning' ||
+        location.pathname === '/';
+
+    if (!shouldShowSearch) {
+        return null;
+    }
+
+    return (
+        <Search
+            style={{
+                width: 300,
+                marginLeft: '20px',
+            }}
+            placeholder="単語を入力してください"
+            allowClear
+            enterButton="検索"
+            size="large"
+            onSearch={onSearch}
+        />
+    );
+};
 
 const Home: React.FC = () => {
     const [collapsed, setCollapsed] = useState(false);
@@ -42,29 +80,39 @@ const Home: React.FC = () => {
     const navigate = useNavigate();
 
     const userStatus = useUserStatusStore((state) => state);
+    const setAvailableUnitNumbers = useWordListStatusStore((state) => state.setAvailableUnitNumbers);
     const avatar = userStatus.avatar;
 
     const isLoggedIn = userStatus.isLoggedIn;
     const userName = userStatus.user?.userName || null;
 
-
-    const [searchText, setSearchText] = useState('');
-
-    const sendSearchRequest = () => {
-        console.log('検索リクエストを送信:', searchText);
-    }
-
-    const location = useLocation();
-
-
-
     let authButtons;
-    let searchBar;
+
+    type GetUnitNumbersApiResponse = {
+    code: number;
+    message: string;
+    data: string[];
+};
+
+    useEffect(() => {
+        async function getAvailableUnitNumbers() {
+            try {
+                const response = await axios.get<GetUnitNumbersApiResponse>(
+                    "http://localhost:8080/word/getUnitNumbers"
+                );
+                setAvailableUnitNumbers(response.data.data.map(Number));
+            } catch (error) {
+                console.error("単元リストの取得に失敗しました", error);
+            }
+        }
+        getAvailableUnitNumbers();
+    }, [setAvailableUnitNumbers]);
+
 
     if (isLoggedIn) {
         authButtons = (
-            <div>
-                <span>{userName + 'さん, こんにちは'}</span>
+            <div style={{ display: 'flex', alignItems: 'center', marginRight: '20px'}}>
+                    <p style={{ fontSize: '20px' ,fontWeight: 'bold' }}>{userName + 'さん, こんにちは'}</p>
             </div>
         );
     } else {
@@ -83,80 +131,81 @@ const Home: React.FC = () => {
         );
     }
 
-    if (location.pathname === '/wordlist'|| location.pathname === '/testresult'
-        || location.pathname === '/learning' || location.pathname === '/') 
-     {
-        searchBar = (
-            <>
-                <div style={{ marginRight: '16px' }}>
-                    <input type="text" value={searchText} onChange={(e) => setSearchText(e.target.value)} />
-                </div>
-                <Button type="primary" onClick={() => sendSearchRequest()}>
-                    検索
-                </Button>
-            </>
-        );
-    }
 
     return (
-        <Layout style={{ minHeight: '100vh' }}>
-            <Sider trigger={null} collapsible collapsed={collapsed}>
+        <Layout style={{ height: '100vh', overflow: 'hidden' }}>
+            <Sider trigger={null} collapsible collapsed={collapsed} width={450} collapsedWidth={150}>
                 <div className="demo-logo-vertical" />
                 <div style={{ textAlign: 'center' }}>
                     <Avatar
                         onClick={() => navigate('/myprofile')}
-                        size="large" icon={avatarIconMap[avatar || 'Icon1']}
-                        style={{ cursor: 'pointer', margin: '16px' }} />
+                        size={120} icon={avatarIconMap[avatar || 'Icon1']}
+                        style={{ cursor: 'pointer', margin: '16px', backgroundColor: '#5cbbe3' }} />
                 </div>
-                <Menu
-                    theme="dark"
-                    mode="inline"
-                    defaultSelectedKeys={['1']}
-                    items={[
-                        {
-                            key: '1',
-                            icon: (<HomeOutlined />),
-                            label: 'Home',
-                            onClick: () => navigate('/'),
+                <ConfigProvider
+                    theme={{
+                        components: {
+                            Menu: {
+                                itemHeight: 65,          // 修改：菜单项高度
+                                iconSize: 30,            // 修改：展开状态图标大小
+                                collapsedIconSize: 40,   // 修改：折叠状态图标大小
+                                fontSize: 30,            // 修改：菜单文字大小
+                                iconMarginInlineEnd: 20,      // 修改：图标与文字的间距
+                            },
                         },
-                        {
-                            key: '2',
-                            icon: <EditOutlined />,
-                            label: '学習',
-                            onClick: () => navigate('/learning'),
-                        },
-                        {
-                            key: '3',
-                            icon: <FormOutlined />,
-                            label: 'テスト',
-                            onClick: () => navigate('/test'),
-                        },
-                        {
-                            key: '4',
-                            icon: <TagOutlined />,
-                            label: '重要単語',
-                            onClick: () => navigate('/wordlist'),
-                        },
-                        {
-                            key: '5',
-                            icon: <CloseOutlined />,
-                            label: 'バツ単語',
-                            onClick: () => navigate('/wordlist'),
-                        },
-                        {
-                            key: '6',
-                            icon: <TagsOutlined />,
-                            label: '単語リスト',
-                            onClick: () => navigate('/wordlist'),
-                        },
-                        {
-                            key: '7',
-                            icon: <UserOutlined />,
-                            label: 'マイプロフィール',
-                            onClick: () => navigate('/myprofile'),
-                        },
-                    ]}
-                />
+                    }}
+                >
+                    <Menu
+                        className="home-menu"
+                        theme="dark"
+                        mode="inline"
+                        defaultSelectedKeys={['1']}
+                        items={[
+                            {
+                                key: '1',
+                                icon: (<HomeOutlined />),
+                                label: 'Home',
+                                onClick: () => navigate('/'),
+                            },
+                            {
+                                key: '2',
+                                icon: <EditOutlined />,
+                                label: '学習',
+                                onClick: () => navigate('/learning'),
+                            },
+                            {
+                                key: '3',
+                                icon: <FormOutlined />,
+                                label: 'テスト',
+                                onClick: () => navigate('/scopechoosing'),
+                            },
+                            {
+                                key: '4',
+                                icon: <TagOutlined />,
+                                label: '重要単語',
+                                onClick: () => navigate('/wordlist'),
+                            },
+                            {
+                                key: '5',
+                                icon: <CloseOutlined />,
+                                label: 'バツ単語',
+                                onClick: () => navigate('/wordlist'),
+                            },
+                            {
+                                key: '6',
+                                icon: <TagsOutlined />,
+                                label: '単語リスト',
+                                onClick: () => navigate('/wordlist'),
+                            },
+                            {
+                                key: '7',
+                                icon: <UserOutlined />,
+                                label: 'マイプロフィール',
+                                onClick: () => navigate('/myprofile'),
+                            },
+                        ]}
+                    />
+                </ConfigProvider>
             </Sider>
             <Layout>
                 <Header style={{
@@ -174,7 +223,7 @@ const Home: React.FC = () => {
                             marginRight: '26px',
                         }}
                     />
-                    {searchBar}
+                    <SearchBar />
                     <div style={{ flex: 1 }}></div>
                     {authButtons}
                 </Header>

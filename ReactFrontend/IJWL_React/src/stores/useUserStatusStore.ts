@@ -8,7 +8,7 @@ export type AvatarType =
   | 'Icon5'
 
 export type UserStatusInfo = {
-  userId: string | null;
+  userId: number | null;
   userName: string | null;
   backgroundColor: string | null;
   fontSize: string | null;

@@ -1,3 +1,4 @@
+import axios from "axios"; // 修改：导入 axios
 import { create } from "zustand";
 
 export enum WordListStatus {
@@ -7,15 +8,22 @@ export enum WordListStatus {
 }
 
 export type Word = {
-    wordId: string;
+    wordId: number;
     chinese: string;
     japanese: string;
 };
 
+type GetWordsApiResponse = {
+    code: number;
+    message: string;
+    data: Word[];
+};
+
 type WordListStatusStore = {
     wordListStatus: Record<string, WordListStatus>;
-    wordList: Word[];
-    unitNumber: number | null;
+    wordList: Word[] | null;
+    unitNumbers: number[] | null;
+    availableUnitNumbers: number[];
 
     setWordListStatus: (
         wordId: string,
@@ -23,14 +31,22 @@ type WordListStatusStore = {
     ) => void;
 
     setWordList: (wordList: Word[]) => void;
-    setUnitNumber: (unitNumber: number | null) => void;
+
+    setAvailableUnitNumbers: (
+        availableUnitNumbers: number[],
+    ) => void;
+
+    setUnitNumbersAndFetchWordList: (
+        unitNumbers: number[],
+    ) => Promise<void>;
 };
 
 export const useWordListStatusStore =
     create<WordListStatusStore>((set) => ({
         wordListStatus: {},
         wordList: [],
-        unitNumber: null,
+        unitNumbers: null,
+        availableUnitNumbers: [],
 
         setWordListStatus: (wordId, status) =>
             set((state) => ({
@@ -45,8 +61,34 @@ export const useWordListStatusStore =
                 wordList,
             }),
 
-        setUnitNumber: (unitNumber) =>
+        setAvailableUnitNumbers: (availableUnitNumbers) =>
             set({
-                unitNumber,
+                availableUnitNumbers,
             }),
+
+
+        setUnitNumbersAndFetchWordList: async (unitNumbers) => {
+            try {
+                set({
+                    unitNumbers,
+                });
+
+                const response = await axios.post<GetWordsApiResponse>(
+                    "http://localhost:8080/word/getAllWords",
+                    {
+                        unitNumbers: unitNumbers.map(String),
+                    },
+                );
+                set({
+                    wordList: response.data.data,
+                });
+            } catch (error) {
+                console.error("単語リストの取得に失敗しました", error);
+                set({
+                    wordList: [],
+                });
+
+                throw error;
+            }
+        },
     }));

@@ -12,9 +12,9 @@ export default function Homepage() {
                 display: 'flex', flexDirection: 'column',
                 alignItems: 'center', justifyContent: 'center'
             }}>
-                <div>
+                <div style={ {marginBottom: "20px", marginTop: "20px"}}>
                     <Card style={{
-                        width: 250, height: 150, alignItems: 'center',
+                        width: 520, height: 150, alignItems: 'center',
                         justifyContent: 'center', display: 'flex',
                         backgroundColor: '#5cbbe3', borderRadius: '50px',
                         cursor: "pointer"
@@ -44,7 +44,7 @@ export default function Homepage() {
                         backgroundColor: '#5cbbe3', borderRadius: '50px',
                         cursor: "pointer"
                     }}
-                        onClick={() => navigate('/test')}
+                        onClick={() => navigate('/scopechoosing')}
                     >
                         <h1>テスト</h1>
                     </Card>
@@ -62,13 +62,14 @@ export default function Homepage() {
                         onClick={() => navigate('/wordlist')}
                     >
                         <h1>重要単語</h1>
-                    </Card><Card style={{
+                    </Card>
+                    <Card style={{
                         width: 250, height: 150, alignItems: 'center',
                         justifyContent: 'center', display: 'flex',
                         backgroundColor: '#5cbbe3', borderRadius: '50px',
                         cursor: "pointer"
                     }}
-                        onClick={() => navigate('/test')}
+                        onClick={() => navigate('/wordlist')}
                     >
                         <h1>バツ単語</h1>
                     </Card>
@@ -77,3 +78,5 @@ export default function Homepage() {
         </>
     )
 }
+
+

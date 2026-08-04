@@ -20,7 +20,7 @@ const Login: React.FC = () => {
     const onFinish: FormProps<FieldType>['onFinish'] = (values) => {
         async function login() {
             try {
-                const response =await axios.post('http://localhost:8080/user/signIn',
+                const response =await axios.post('http://localhost:8080/users/signIn',
                     values,
                     {
                         headers: {
@@ -29,12 +29,12 @@ const Login: React.FC = () => {
                     }
                 );
 
-                const data = response.data;
+                const data = response.data.data;
                 console.log(data);
 
                 userStatus.login({
                     userId: data.userId,
-                    userName: data.userName,
+                    userName: values.username??'',
                     backgroundColor: data.backgroundColor,
                     fontSize: data.fontSize,
                 });

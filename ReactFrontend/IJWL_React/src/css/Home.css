@@ -1,0 +1,31 @@
+/* Home.css */
+
+.home-menu {
+    border-inline-end: none !important;
+}
+
+/* 修改：控制菜单项外观，不再直接修改图标 */
+.home-menu .ant-menu-item {
+    margin-block: 8px;
+    border-radius: 10px;
+}
+
+/* 修改：图标与文字的间距 */
+.home-menu .ant-menu-title-content {
+    margin-inline-start: 14px;
+}
+
+/* 修改：鼠标悬停 */
+.home-menu .ant-menu-item:hover {
+    background-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+/* 修改：选中状态 */
+.home-menu .ant-menu-item-selected {
+    background-color: #1677ff !important;
+}
+
+/* 修改：折叠状态菜单项间距 */
+.home-menu.ant-menu-inline-collapsed .ant-menu-item {
+    margin-block: 10px;
+}
