@@ -1,7 +1,12 @@
 
+
+
+
 export default function TestHistory() {
-    
+
     return (
-        <div>TestHistory</div>
+        <>
+            <div>TestHistory</div>
+        </>
     )
 }

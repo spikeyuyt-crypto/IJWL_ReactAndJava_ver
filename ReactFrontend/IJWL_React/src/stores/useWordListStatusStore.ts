@@ -1,4 +1,4 @@
-import axios from "axios"; // 修改：导入 axios
+import axios from "axios"; 
 import { create } from "zustand";
 
 export enum WordListStatus {
@@ -20,13 +20,12 @@ type GetWordsApiResponse = {
 };
 
 type WordListStatusStore = {
-    wordListStatus: Record<string, WordListStatus>;
+    wordListStatus: WordListStatus;
     wordList: Word[] | null;
     unitNumbers: number[] | null;
     availableUnitNumbers: number[];
 
     setWordListStatus: (
-        wordId: string,
         status: WordListStatus,
     ) => void;
 
@@ -43,18 +42,16 @@ type WordListStatusStore = {
 
 export const useWordListStatusStore =
     create<WordListStatusStore>((set) => ({
-        wordListStatus: {},
+        wordListStatus: WordListStatus.default,
         wordList: [],
         unitNumbers: null,
         availableUnitNumbers: [],
 
-        setWordListStatus: (wordId, status) =>
-            set((state) => ({
-                wordListStatus: {
-                    ...state.wordListStatus,
-                    [wordId]: status,
-                },
-            })),
+        setWordListStatus: (status) => {
+            set({
+                wordListStatus: status,
+            });
+        },
 
         setWordList: (wordList) =>
             set({

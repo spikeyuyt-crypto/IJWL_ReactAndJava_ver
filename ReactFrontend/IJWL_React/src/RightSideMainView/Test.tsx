@@ -8,6 +8,7 @@ import { message, Input, Button } from "antd";
 export default function Test() {
 
     const navigate = useNavigate();
+
     const wordList = useWordListStatusStore(
         (state) => state.wordList,
     );
@@ -16,17 +17,17 @@ export default function Test() {
         (state) => state.setStartedAt
     );
 
-    const setTestWordList = useTestStore(
-        (state) => state.setTestWordList
+    const setTestItemList = useTestStore(
+        (state) => state.setTestItemList
     );
 
-    const setAnswerList = useTestStore(
-        (state) => state.setAnswerList
-    )
+    const setAnswer = useTestStore(
+        (state) => state.setAnswer
+    );
 
-    const setJudgeList = useTestStore(
-        (state) => state.setJudgeList
-    )
+    const setJudge = useTestStore(
+        (state) => state.setJudge
+    );
 
     function shuffleWordList(wordList: Word[]) {
         return wordList.map(word => ({ ...word })).sort(() => Math.random() - 0.5);
@@ -34,83 +35,84 @@ export default function Test() {
 
     const [currentWordIndex, setCurrentWordIndex] = useState(0);
 
-    const [tmpAnswerList, setTmpAnswerList] = useState<string[]>([]);
-
-    function updateTmpAnswerList(answer: string) {
-        setTmpAnswerList((previousList) => {
-            const newList = [...previousList];
-            newList[currentWordIndex] = answer;
-            return newList;
-        });
-    }
-
-    const [tmpJudgeList, setTmpJudgeList] = useState<boolean[]>([]);
-
-    function updateTmpJudgeList(answer: string): boolean[] {
-        const newList = [...tmpJudgeList];
-
-        newList[currentWordIndex] =
-            answer.trim() ===
-            testWordList[currentWordIndex].japanese.trim();
-
-        setTmpJudgeList(newList);
-
-        return newList;
-    }
+    const setEndedAt = useTestStore(
+        (state) => state.setEndedAt
+    );
 
 
     useEffect(() => {
         if (!wordList || wordList.length === 0) {
             message.warning("テストする単語がありません");
-            navigate("/learning");
+            setTimeout(() => navigate("/scopechoosing", { replace: true }), 3000);
             return;
         }
         const randomWords = shuffleWordList(wordList).slice(0, 10);
 
-        setTestWordList(randomWords);
-        setStartedAt(new Date());
+        const initialTestItemList = randomWords
+            .map((word) => ({ testWord: word, answer: "", judge: false }));
+
+        setCurrentWordIndex(0);
+        setTestItemList(initialTestItemList);
+        setStartedAt(getLocalDateTimeString());
     }, [
         wordList,
         navigate,
         setStartedAt,
-        setTestWordList,
+        setTestItemList
     ]);
 
-    const testWordList = useTestStore(
-        (state) => state.testWordList,
+
+    const testItemList = useTestStore(
+        (state) => state.testItemList,
     );
 
-    function saveTest( finalJudgeList: boolean[], tmpAnswerList : string[]) {
-        setAnswerList(tmpAnswerList);
-        setJudgeList(finalJudgeList);
-        navigate("/result", { replace: true });
-    }
+    const currentTestItem = testItemList[currentWordIndex];
 
-    if (testWordList.length === 0) {
+    if (!currentTestItem) {
         return <p>読み込み中...</p>;
     }
 
+    function judgeAnswer(currentWordIndex: number) {
+        currentTestItem.answer.trim() === testItemList[currentWordIndex].testWord.japanese 
+        ? setJudge(currentWordIndex, true)
+        : setJudge(currentWordIndex, false);
+    }
+
+    function getLocalDateTimeString(): string {
+    const now = new Date();
+
+    return new Date(
+        now.getTime() - now.getTimezoneOffset() * 60_000
+    )
+        .toISOString()
+        .slice(0, 19);
+}
+
     return (
         <>
-            <p>{testWordList[currentWordIndex].chinese}</p>
+            <p>{currentTestItem.testWord.chinese}</p>
 
-            <Input variant="outlined" value={tmpAnswerList[currentWordIndex] ?? ""}
-                onChange={(event) => { updateTmpAnswerList(event.target.value); }} />
+            <Input variant="outlined" value={testItemList[currentWordIndex].answer}
+                onChange={(event) => {
+                    setAnswer(currentWordIndex, event.target.value);
+                }} />
 
             <Button onClick={() => { setCurrentWordIndex(previousIndex => previousIndex - 1) }}
                 disabled={currentWordIndex === 0}>前に戻る</Button>
 
-            {currentWordIndex === testWordList.length - 1
+            {currentWordIndex === testItemList.length - 1
                 ? <Button type="primary" onClick={() => {
-                    const finalJudgeList = updateTmpJudgeList(tmpAnswerList[currentWordIndex] ?? "",);
-                    saveTest( finalJudgeList, tmpAnswerList);
+                    judgeAnswer(currentWordIndex);
+                    setEndedAt(getLocalDateTimeString());
+                    navigate("/testresult", { replace: true });
                 }}>終了</Button>
+
                 : <Button type="primary"
                     onClick={() => {
-                        updateTmpJudgeList(tmpAnswerList[currentWordIndex] ?? "");
+                        judgeAnswer(currentWordIndex);
                         setCurrentWordIndex(previousIndex => previousIndex + 1)
                     }}
-                    disabled={currentWordIndex === testWordList.length - 1}>次へ</Button>}
+                    disabled={currentWordIndex === testItemList.length - 1}>次へ</Button>}
         </>
     )
 }

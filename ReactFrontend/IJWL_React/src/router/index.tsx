@@ -1,4 +1,3 @@
-import Root from "../Root";
 import { createBrowserRouter } from "react-router-dom";
 import Home from "../screens/Home";
 import Login from "../screens/Login";
@@ -18,54 +17,49 @@ import WordList from "../RightSideMainView/WordList";
 const router = createBrowserRouter([
     {
         path: "/",
-        element: <Root />,
+        element: <Home />,
         children: [
             {
-                element: <Home />,
-                children: [
-                    {
-                        index: true,
-                        element: <Homepage />,
-                    },
-                    {
-                        path: "learning",
-                        element: <Learning />,
-                    },
-                    {
-                        path: "myprofile",
-                        element: <MyProfile />,
-                    },
-                    {
-                        path: "scopechoosing",
-                        element: <ScopeChoosing />,
-                    },
-                    {
-                        path: "test",
-                        element: <Test />,
-                    },
-                    {
-                        path: "testresult",
-                        element: <TestResult />,
-                    },
-                    {
-                        path: "testhistory",
-                        element: <TestHistory />,
-                    },
-                    {
-                        path: "wordlist",
-                        element: <WordList />,
-                    },
-                ],
+                index: true,
+                element: <Homepage />,
             },
             {
-                path: "login",
-                element: <Login />,
+                path: "learning",
+                element: <Learning />,
             },
             {
-                path: "register",
-                element: <Register />,
+                path: "myprofile",
+                element: <MyProfile />,
+            },
+            {
+                path: "scopechoosing",
+                element: <ScopeChoosing />,
+            },
+            {
+                path: "test",
+                element: <Test />,
+            },
+            {
+                path: "testresult",
+                element: <TestResult />,
+            },
+            {
+                path: "testhistory",
+                element: <TestHistory />,
+            },
+            {
+                path: "wordlist",
+                element: <WordList />,
             },
         ],
+    },
+    {
+        path: "/login",
+        element: <Login />,
+    },
+    {
+        path: "/register",
+        element: <Register />,
     },
 ]);
 

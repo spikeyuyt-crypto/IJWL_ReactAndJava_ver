@@ -7,6 +7,7 @@ import '../css/Home.css';
 import { Input, } from 'antd';
 import type { GetProps } from 'antd';
 import axios from 'axios';
+import { WordListStatus } from '../stores/useWordListStatusStore';
 
 // 导入图标
 import {
@@ -80,7 +81,14 @@ const Home: React.FC = () => {
     const navigate = useNavigate();
 
     const userStatus = useUserStatusStore((state) => state);
-    const setAvailableUnitNumbers = useWordListStatusStore((state) => state.setAvailableUnitNumbers);
+
+    const setWordListStatus = useWordListStatusStore(
+        (state) => state.setWordListStatus
+    );
+
+    const setAvailableUnitNumbers = useWordListStatusStore(
+        (state) => state.setAvailableUnitNumbers
+    );
     const avatar = userStatus.avatar;
 
     const isLoggedIn = userStatus.isLoggedIn;
@@ -89,10 +97,10 @@ const Home: React.FC = () => {
     let authButtons;
 
     type GetUnitNumbersApiResponse = {
-    code: number;
-    message: string;
-    data: string[];
-};
+        code: number;
+        message: string;
+        data: string[];
+    };
 
     useEffect(() => {
         async function getAvailableUnitNumbers() {
@@ -111,8 +119,8 @@ const Home: React.FC = () => {
 
     if (isLoggedIn) {
         authButtons = (
-            <div style={{ display: 'flex', alignItems: 'center', marginRight: '20px'}}>
-                    <p style={{ fontSize: '20px' ,fontWeight: 'bold' }}>{userName + 'さん, こんにちは'}</p>
+            <div style={{ display: 'flex', alignItems: 'center', marginRight: '20px' }}>
+                <p style={{ fontSize: '20px', fontWeight: 'bold' }}>{userName + 'さん, こんにちは'}</p>
             </div>
         );
     } else {
@@ -183,19 +191,28 @@ const Home: React.FC = () => {
                                 key: '4',
                                 icon: <TagOutlined />,
                                 label: '重要単語',
-                                onClick: () => navigate('/wordlist'),
+                                onClick: () => {
+                                    setWordListStatus(WordListStatus.important);
+                                    navigate('/wordlist')
+                                },
                             },
                             {
                                 key: '5',
                                 icon: <CloseOutlined />,
                                 label: 'バツ単語',
-                                onClick: () => navigate('/wordlist'),
+                                onClick: () => {
+                                    setWordListStatus(WordListStatus.batsu);
+                                    navigate('/wordlist')
+                                },
                             },
                             {
                                 key: '6',
                                 icon: <TagsOutlined />,
                                 label: '単語リスト',
-                                onClick: () => navigate('/wordlist'),
+                                onClick: () => {
+                                    setWordListStatus(WordListStatus.default);
+                                    navigate('/wordlist')
+                                },
                             },
                             {
                                 key: '7',
