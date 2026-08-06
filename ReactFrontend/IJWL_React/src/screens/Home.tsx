@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Layout, Menu, theme, Avatar, ConfigProvider } from 'antd';
+import { Button, Layout, Menu, theme, Avatar, ConfigProvider, Modal, message } from 'antd';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useUserStatusStore } from '../stores/useUserStatusStore';
 import { useWordListStatusStore } from '../stores/useWordListStatusStore';
@@ -28,7 +28,7 @@ import {
 import type { AvatarType } from '../stores/useUserStatusStore';
 
 
-const avatarIconMap: Record<AvatarType, React.ReactNode> = {
+export const avatarIconMap: Record<AvatarType, React.ReactNode> = {
     Icon1: <UserOutlined />,
     Icon2: <SmileOutlined />,
     Icon3: <RobotOutlined />,
@@ -43,16 +43,131 @@ type SearchProps = GetProps<typeof Input.Search>;
 
 const { Search } = Input;
 
-const onSearch: SearchProps['onSearch'] = (value, _e, info) => console.log(info?.source, value);
+type SearchResult = {
+    japanese: string;
+    chinese: string;
+}
 
 
-const SearchBar: React.FC = () => {
+interface SearchResultModalProps {
+    searchResult: SearchResult[];
+    isModalOpen: boolean;
+    onClose: () => void;
+}
+
+interface SearchBarProps {
+    onSearchSuccess: (result: SearchResult[]) => void;
+    onSearchError: () => void;
+}
+
+const SearchResultModal: React.FC<SearchResultModalProps> = ({
+    searchResult,
+    isModalOpen,
+    onClose,
+}) => {
+    const [index, setIndex] = useState(0);
+
+    useEffect(() => {
+        if (isModalOpen) {
+            setIndex(0);
+        }
+    }, [isModalOpen, searchResult]);
+
+    const currentResult = searchResult[index];
+
+    return (
+        <Modal
+            title="検索結果"
+            centered
+            open={isModalOpen}
+            onOk={onClose}
+            onCancel={onClose}
+            okText="閉じる"
+            cancelButtonProps={{
+                style: {
+                    display: "none",
+                },
+            }}
+        >
+            {currentResult ? (
+                <>
+                    <p>日本語：{currentResult.japanese}</p>
+                    <p>中国語：{currentResult.chinese}</p>
+                    <div
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                        }}
+                    >
+                        <Button
+                            onClick={() => setIndex((previousIndex) => previousIndex - 1,)}
+                            disabled={index === 0}
+                            style={{ visibility: index === 0 ? "hidden" : "visible" }}>
+                            前へ
+                        </Button>
+
+                        <span>
+                            {index + 1} / {searchResult.length}
+                        </span>
+
+                        <Button
+                            onClick={() => setIndex((previousIndex) => previousIndex + 1,)}
+                            disabled={index >= searchResult.length - 1}
+                            style={{ visibility: index >= searchResult.length - 1 ? "hidden" : "visible" }}>
+                            次へ
+                        </Button>
+                    </div>
+                </>
+            ) : (
+                <p>検索結果がありません</p>
+            )}
+        </Modal>
+    );
+};
+
+const SearchBar: React.FC<SearchBarProps> = ({
+    onSearchSuccess,
+    onSearchError,
+}) => {
     const location = useLocation();
+
     const shouldShowSearch =
-        location.pathname === '/wordlist' ||
-        location.pathname === '/testresult' ||
-        location.pathname === '/learning' ||
-        location.pathname === '/';
+        location.pathname === "/wordlist" ||
+        location.pathname === "/testresult" ||
+        location.pathname === "/learning" ||
+        location.pathname === "/";
+
+
+    const handleSearch: SearchProps["onSearch"] = async (value) => {
+        const searchValue = value.trim();
+
+        if (searchValue === "") {
+            message.warning("検索語を入力してください");
+            return;
+        }
+
+        try {
+            const response = await axios.post(
+                "http://localhost:8080/word/searchWord",
+                searchValue,
+                {
+                    headers: {
+                        "Content-Type": "text/plain",
+                    },
+                },
+            );
+
+            const result: SearchResult[] =
+                response.data.data ?? [];
+
+            onSearchSuccess(result);
+        } catch (error) {
+            console.error("単語の検索に失敗しました", error);
+
+            onSearchError();
+        }
+    };
 
     if (!shouldShowSearch) {
         return null;
@@ -62,19 +177,25 @@ const SearchBar: React.FC = () => {
         <Search
             style={{
                 width: 300,
-                marginLeft: '20px',
+                marginLeft: "20px",
             }}
             placeholder="単語を入力してください"
             allowClear
             enterButton="検索"
             size="large"
-            onSearch={onSearch}
+            onSearch={handleSearch}
         />
     );
 };
 
 const Home: React.FC = () => {
     const [collapsed, setCollapsed] = useState(false);
+
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const [searchResult, setSearchResult] =
+        useState<SearchResult[]>([]);
+
     const {
         token: { colorBgContainer, borderRadiusLG },
     } = theme.useToken();
@@ -120,7 +241,7 @@ const Home: React.FC = () => {
     if (isLoggedIn) {
         authButtons = (
             <div style={{ display: 'flex', alignItems: 'center', marginRight: '20px' }}>
-                <p style={{ fontSize: '20px', fontWeight: 'bold' }}>{userName + 'さん, こんにちは'}</p>
+                <p style={{ fontSize: '20px', fontWeight: 'bold' }}>{userName + '　さん, こんにちは'}</p>
             </div>
         );
     } else {
@@ -142,12 +263,18 @@ const Home: React.FC = () => {
 
     return (
         <Layout style={{ height: '100vh', overflow: 'hidden' }}>
+            <SearchResultModal
+                searchResult={searchResult}
+                isModalOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+            />
             <Sider trigger={null} collapsible collapsed={collapsed} width={450} collapsedWidth={150}>
                 <div className="demo-logo-vertical" />
                 <div style={{ textAlign: 'center' }}>
                     <Avatar
                         onClick={() => navigate('/myprofile')}
-                        size={120} icon={avatarIconMap[avatar || 'Icon1']}
+                        size={120}
+                        icon={avatarIconMap[avatar || 'Icon1']}
                         style={{ cursor: 'pointer', margin: '16px', backgroundColor: '#5cbbe3' }} />
                 </div>
                 <ConfigProvider
@@ -240,7 +367,16 @@ const Home: React.FC = () => {
                             marginRight: '26px',
                         }}
                     />
-                    <SearchBar />
+                    <SearchBar
+                        onSearchSuccess={(result) => {
+                            setSearchResult(result);
+                            setIsModalOpen(true);
+                        }}
+                        onSearchError={() => {
+                            setSearchResult([]);
+                            setIsModalOpen(true);
+                        }}
+                    />
                     <div style={{ flex: 1 }}></div>
                     {authButtons}
                 </Header>

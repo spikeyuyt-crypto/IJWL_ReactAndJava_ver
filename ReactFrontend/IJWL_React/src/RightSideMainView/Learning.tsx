@@ -116,19 +116,36 @@ export default function Learning() {
             wordId: wordId,
             userId: userId,
         };
-        await axios.post('http://localhost:8080/word/markWord', [data], {
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
+        try {
+            await axios.post('http://localhost:8080/word/markWord', [data], {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+            messageApi.success('マークしました');
+        }
+        catch (error) {
+            messageApi.error('マークに失敗しました');
+        };
     }
 
     return (
         <>
-            <div>
+            <div style={{
+                display: 'flex', flexDirection: 'column'
+                , justifyContent: 'center', alignItems: 'center'
+            }}>
                 <div>
-                    <p>{displayWordList[currentWordIndex].chinese}</p>
-                    <p style={{ visibility: showJapanese ? 'visible' : 'hidden' }}>{displayWordList[currentWordIndex].japanese}</p>
+                    <p
+                        style={{ fontSize: 50 }}>
+                        {displayWordList[currentWordIndex].chinese}
+                    </p>
+                    <p style={{
+                        visibility: showJapanese ? 'visible' : 'hidden',
+                        fontSize: 50
+                    }}>
+                        {displayWordList[currentWordIndex].japanese}
+                    </p>
 
                     <Button type="primary" onClick={() => setShowJapanese(!showJapanese)}
                         disabled={displayWordList[currentWordIndex].japanese === ""}>答えを見る</Button>
