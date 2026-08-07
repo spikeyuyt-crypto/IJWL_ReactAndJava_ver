@@ -119,7 +119,9 @@ export default function WordList() {
                 return (
                     <>
                         <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-around' }}>
-                            <Button type="default"
+                            <Button
+                                type="default"
+                                disabled={userId === null}
                                 style={{ backgroundColor: importantWordIds.includes(record.wordId) ? 'rgb(243, 255, 19)' : 'rgb(255, 255, 255)' }}
                                 onClick={() => {
                                     importantWordIds.includes(record.wordId)
@@ -128,7 +130,9 @@ export default function WordList() {
                                 }}>
                                 マーク
                             </Button>
-                            <Button type="default"
+                            <Button
+                                type="default"
+                                disabled={userId === null}
                                 onClick={() => {
                                     setOpenMemoModal(true);
                                     setCurrentWordId(record.wordId);
@@ -480,7 +484,7 @@ export default function WordList() {
                             showSizeChanger: true,
                             pageSizeOptions: [5, 10, 20, 50],
 
-                            onChange: (page, pageSize) => {
+                            onChange: ( pageSize) => {
                                 setCurrentPageSize(pageSize);
                             },
                         }}

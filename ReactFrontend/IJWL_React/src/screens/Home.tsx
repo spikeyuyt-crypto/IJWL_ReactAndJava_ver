@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Layout, Menu, theme, Avatar, ConfigProvider, Modal, message } from 'antd';
+import { Button, Layout, Menu, theme, Avatar, ConfigProvider, Modal, message, Switch } from 'antd';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useUserStatusStore } from '../stores/useUserStatusStore';
 import { useWordListStatusStore } from '../stores/useWordListStatusStore';
@@ -8,7 +8,8 @@ import { Input, } from 'antd';
 import type { GetProps } from 'antd';
 import axios from 'axios';
 import { WordListStatus } from '../stores/useWordListStatusStore';
-
+import { IoMdSunny } from "react-icons/io";
+import { PiMoonLight } from "react-icons/pi";
 // 导入图标
 import {
     MenuFoldOutlined,
@@ -197,8 +198,9 @@ const Home: React.FC = () => {
         useState<SearchResult[]>([]);
 
     const {
-        token: { colorBgContainer, borderRadiusLG },
+        token: { borderRadiusLG },
     } = theme.useToken();
+
     const navigate = useNavigate();
 
     const userStatus = useUserStatusStore((state) => state);
@@ -214,6 +216,47 @@ const Home: React.FC = () => {
 
     const isLoggedIn = userStatus.isLoggedIn;
     const userName = userStatus.user?.userName || null;
+
+    const darkMode = userStatus.darkMode;
+
+    const setDarkMode = userStatus.switchDarkMode;
+
+    const wordListStatus = useWordListStatusStore(
+        (state) => state.wordListStatus
+    );
+
+    let currentKey = "1";
+
+    if (location.pathname === "/learning") {
+        currentKey = "2";
+    } else if (location.pathname === "/scopechoosing") {
+        currentKey = "3";
+    } else if (location.pathname === "/myprofile") {
+        currentKey = "7";
+    } else if (location.pathname === "/wordlist") {
+        if (wordListStatus === WordListStatus.important) {
+            currentKey = "4";
+        } else if (wordListStatus === WordListStatus.batsu) {
+            currentKey = "5";
+        } else {
+            currentKey = "6";
+        }
+    }
+
+    const darkModeSwitch = (
+        <Switch
+
+            defaultChecked={darkMode}
+            onChange={setDarkMode}
+            style={{
+                marginRight: '20px',
+                transform: "scale(2)",
+                transformOrigin: "right center"
+            }}
+            checkedChildren={<PiMoonLight />}
+            unCheckedChildren={<IoMdSunny />}
+        />
+    )
 
     let authButtons;
 
@@ -260,6 +303,15 @@ const Home: React.FC = () => {
         );
     }
 
+    const {
+        token: {
+            colorPrimary,
+            colorPrimaryBg,
+            colorPrimaryActive,
+            colorTextLightSolid,
+        },
+    } = theme.useToken();
+
 
     return (
         <Layout style={{ height: '100vh', overflow: 'hidden' }}>
@@ -268,7 +320,9 @@ const Home: React.FC = () => {
                 isModalOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
             />
-            <Sider trigger={null} collapsible collapsed={collapsed} width={450} collapsedWidth={150}>
+            <Sider trigger={null} collapsible
+                collapsed={collapsed} width={450} collapsedWidth={150}
+                style={{ backgroundColor: colorPrimaryActive }} >
                 <div className="demo-logo-vertical" />
                 <div style={{ textAlign: 'center' }}>
                     <Avatar
@@ -281,11 +335,15 @@ const Home: React.FC = () => {
                     theme={{
                         components: {
                             Menu: {
-                                itemHeight: 65,          // 修改：菜单项高度
-                                iconSize: 30,            // 修改：展开状态图标大小
-                                collapsedIconSize: 40,   // 修改：折叠状态图标大小
-                                fontSize: 30,            // 修改：菜单文字大小
-                                iconMarginInlineEnd: 20,      // 修改：图标与文字的间距
+                                algorithm: true,
+                                itemHeight: 65,
+                                iconSize: 30,
+                                collapsedIconSize: 40,
+                                fontSize: 30,
+                                iconMarginInlineEnd: 20,
+                                darkItemBg: colorPrimary,
+                                darkItemSelectedBg: colorPrimaryActive,
+                                darkItemColor: colorTextLightSolid,
                             },
                         },
                     }}
@@ -295,6 +353,7 @@ const Home: React.FC = () => {
                         theme="dark"
                         mode="inline"
                         defaultSelectedKeys={['1']}
+                        selectedKeys={[currentKey]}
                         items={[
                             {
                                 key: '1',
@@ -353,7 +412,7 @@ const Home: React.FC = () => {
             </Sider>
             <Layout>
                 <Header style={{
-                    padding: 0, background: colorBgContainer,
+                    padding: 0, background: colorPrimaryBg,
                     alignItems: 'center', display: 'flex'
                 }}>
                     <Button
@@ -378,6 +437,7 @@ const Home: React.FC = () => {
                         }}
                     />
                     <div style={{ flex: 1 }}></div>
+                    {darkModeSwitch}
                     {authButtons}
                 </Header>
                 <Content
@@ -385,7 +445,7 @@ const Home: React.FC = () => {
                         margin: '24px 16px',
                         padding: 24,
                         minHeight: 280,
-                        background: colorBgContainer,
+                        background: colorPrimaryBg,
                         borderRadius: borderRadiusLG,
                     }}
                 >

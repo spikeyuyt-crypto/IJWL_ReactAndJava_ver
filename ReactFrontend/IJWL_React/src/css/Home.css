@@ -20,11 +20,6 @@
     background-color: rgba(255, 255, 255, 0.12) !important;
 }
 
-/* 修改：选中状态 */
-.home-menu .ant-menu-item-selected {
-    background-color: #1677ff !important;
-}
-
 /* 修改：折叠状态菜单项间距 */
 .home-menu.ant-menu-inline-collapsed .ant-menu-item {
     margin-block: 10px;

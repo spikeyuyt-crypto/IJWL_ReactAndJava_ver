@@ -1,15 +1,81 @@
-import { Avatar, Modal, Button, Popconfirm, BorderBeam } from "antd";
+import { Avatar, Modal, Button, Popconfirm, BorderBeam, message } from "antd";
 import { useNavigate } from "react-router-dom";
 import { useUserStatusStore, type AvatarType } from "../stores/useUserStatusStore";
 import { avatarIconMap } from "../screens/Home.tsx";
 import { useState } from "react";
 import React from "react";
+import axios from "axios";
+
+
+type SelectableListProps<T> = {
+    items: T[];
+    selectedItem: T | null;
+    borderRadius?: string | number;
+    onSelect: (item: T) => void;
+    renderItem: (item: T) => React.ReactNode;
+};
+
+function SelectableList<T>({
+    items,
+    selectedItem,
+    onSelect,
+    renderItem,
+    borderRadius = "12px",
+}: SelectableListProps<T>) {
+
+    return (
+        <>
+            {items.map((item, index) => {
+                const isSelected = selectedItem === item;
+
+                return (
+                    <div
+                        key={index}
+                        onClick={() => onSelect(item)}
+                        style={{
+                            position: "relative",
+                            width: "fit-content",
+                            height: "fit-content",
+                            padding: 4,
+                            margin: 16,
+                            display: "inline-flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            borderRadius: borderRadius,
+                            overflow: "hidden",
+                            cursor: "pointer",
+                            boxSizing: "border-box",
+                        }}
+                    >
+                        {isSelected ? (
+                            <BorderBeam
+                                size={70}
+                                duration={0.5}
+                                lineWidth={3}
+                                outset={0}
+                                color="#fff700"
+                            >
+                                {renderItem(item)}
+                            </BorderBeam>
+                        ) : (
+                            renderItem(item)
+                        )}
+                    </div>
+                );
+            })}
+        </>
+    );
+}
 
 export default function MyProfile() {
 
     const navigate = useNavigate();
 
     const { avatar } = useUserStatusStore();
+
+    const [messageApi, contextHolder] = message.useMessage();
+
+    const userId = useUserStatusStore((state) => state.user?.userId ?? null);
 
     const [isAvatarChoosingModalOpen, setIsAvatarChoosingModalOpen] = useState(false);
 
@@ -31,12 +97,51 @@ export default function MyProfile() {
     );
 
 
+    const setThemeColor = useUserStatusStore(
+        (state) => state.setThemeColor
+    );
+
+    const backgroundColorList = [
+        "violet",
+        "blue",
+        "green",
+        "orange"
+    ];
+
+    const themeColorMap: Record<string, string> = {
+        violet: "#7C3AED",
+        blue: "#3B82F6",
+        green: "#10B981",
+        orange: "#F59E0B",
+    };
+
+    async function upgradeUserSettings(
+        color: string | null,
+        fontSize: string | null,
+        userId: number | null) {
+
+        try {
+            await axios.put('http://localhost:8080/settings/update', {
+                backgroundColor: color,
+                fontSize: fontSize,
+                userId: userId
+            });
+            messageApi.success('設定を更新しました');
+        } catch (error) {
+            if(userId !== null) {
+                messageApi.error('設定の保存に失敗しました');
+            }
+        }
+    }
+
+
     return (
         <>
             <div style={{
                 display: 'flex', flexDirection: 'column',
                 alignItems: 'center', justifyContent: 'center'
             }}>
+                {contextHolder}
                 <h1>マイプロフィール</h1>
                 <Modal
                     okText="変更"
@@ -53,68 +158,64 @@ export default function MyProfile() {
                         setIsAvatarChoosingModalOpen(false)
                     }}
                 >
-                    {(Object.keys(avatarIconMap) as AvatarType[]).map((key) => {
-                        const isSelected = temporaryAvatar === key;
-
-                        const content = (
-                            <div
-                                onClick={() => {
-                                    setTemporaryAvatar(key);
-                                }}
+                    <SelectableList<AvatarType>
+                        items={Object.keys(avatarIconMap) as AvatarType[]}
+                        selectedItem={temporaryAvatar}
+                        onSelect={setTemporaryAvatar}
+                        borderRadius="50%"
+                        renderItem={(avatarKey) => (
+                            <Avatar
+                                size={100}
+                                icon={avatarIconMap[avatarKey]}
                                 style={{
-                                    position: "relative",
-                                    width: 108,
-                                    height: 108,
-                                    padding: 4,
-                                    margin: 16,
-                                    display: "inline-flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    borderRadius: "50%",
-                                    cursor: "pointer",
-                                    boxSizing: "border-box",
+                                    backgroundColor: "#5cbbe3",
                                 }}
-                            >
-                                <Avatar
-                                    size={100}
-                                    icon={avatarIconMap[key]}
-                                    style={{
-                                        backgroundColor: "#5cbbe3",
-                                    }}
-                                />
-                            </div>
-                        );
-
-                        return (
-                            <React.Fragment key={key}>
-                                {isSelected ? (
-                                    <BorderBeam
-                                        size={70}
-                                        duration={0.5}
-                                        lineWidth={3}
-                                        outset={0}
-                                        color="#fff700"
-                                    >
-                                        {content}
-                                    </BorderBeam>
-                                ) : (
-                                    content
-                                )}
-                            </React.Fragment>
-                        );
-                    })}
+                            />
+                        )}
+                    />
                 </Modal>
                 <Modal
                     onCancel={() => setIsFontChoosingModalOpen(false)}
                     onOk={() => setIsFontChoosingModalOpen(false)}
-                    open={isFontChoosingModalOpen}>
-
+                    open={isFontChoosingModalOpen}
+                    okText="変更"
+                    cancelText="キャンセル"
+                >
+                    <SelectableList<AvatarType>
+                        items={Object.keys(avatarIconMap) as AvatarType[]}
+                        selectedItem={temporaryAvatar}
+                        onSelect={setTemporaryAvatar}
+                        renderItem={(avatarKey) => (
+                            <></>
+                        )}
+                    />
                 </Modal>
                 <Modal
                     onCancel={() => setIsBackgroundChoosingModalOpen(false)}
-                    onOk={() => setIsBackgroundChoosingModalOpen(false)}
-                    open={isBackgroundChoosingModalOpen}>
-
+                    onOk={() => {
+                        setIsBackgroundChoosingModalOpen(false)
+                        setThemeColor(temporaryBackgroundColor || "violet")
+                        upgradeUserSettings(temporaryBackgroundColor, temporaryFont, userId)
+                    }}
+                    open={isBackgroundChoosingModalOpen}
+                    okText="変更"
+                    cancelText="キャンセル"
+                >
+                    <SelectableList<string>
+                        items={backgroundColorList}
+                        selectedItem={temporaryBackgroundColor}
+                        onSelect={setTemporaryBackgroundColor}
+                        renderItem={(color) => (
+                            <div
+                                style={{
+                                    width: 100,
+                                    height: 60,
+                                    backgroundColor: themeColorMap[color],
+                                    borderRadius: "10px",
+                                }}
+                            />
+                        )}
+                    />
                 </Modal>
                 <Avatar
                     onClick={() => setIsAvatarChoosingModalOpen(true)}

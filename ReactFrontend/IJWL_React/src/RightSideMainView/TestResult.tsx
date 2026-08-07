@@ -30,8 +30,9 @@ export default function TestResult() {
             messageApi.error("テスト時間の情報が不足しています");
             throw new Error("Test time is missing");
         }
+        console.log(userId, startedAt, endedAt, score, wrongWordIds);
         try {
-            await axios.post('http://localhost:8080/test/recordTest', {
+            await axios.post('http://localhost:8080/test/record', {
                 userId: userId,
                 startedAt: startedAt,
                 endedAt: endedAt,
