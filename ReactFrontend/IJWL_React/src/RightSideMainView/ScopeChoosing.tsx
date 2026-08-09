@@ -80,7 +80,9 @@ export default function ScopeChoosing() {
             <Button type="default" onClick={() => navigate('/')}>キャンセル</Button>
             {modalHolder}
             {contextHolder}
-            <Button type="primary" onClick={() => setTimeout(() => navigate('/test'),500)}>確認</Button>
+            <Button type="primary" onClick={() => setTimeout(() => navigate('/test'),500)}
+                disabled={selectedUnits === null}>
+                    確認</Button>
         </>
     )
 }

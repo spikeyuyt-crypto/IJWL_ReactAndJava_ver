@@ -484,7 +484,7 @@ export default function WordList() {
                             showSizeChanger: true,
                             pageSizeOptions: [5, 10, 20, 50],
 
-                            onChange: ( pageSize) => {
+                            onChange: (_, pageSize) => {
                                 setCurrentPageSize(pageSize);
                             },
                         }}

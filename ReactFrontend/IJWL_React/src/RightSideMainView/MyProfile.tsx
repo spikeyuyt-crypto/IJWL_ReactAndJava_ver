@@ -175,7 +175,10 @@ export default function MyProfile() {
                     />
                 </Modal>
                 <Modal
-                    onCancel={() => setIsFontChoosingModalOpen(false)}
+                    onCancel={() => {
+                        setIsFontChoosingModalOpen(false)
+                        setTemporaryFont(null)
+                    }}
                     onOk={() => setIsFontChoosingModalOpen(false)}
                     open={isFontChoosingModalOpen}
                     okText="変更"
@@ -191,7 +194,10 @@ export default function MyProfile() {
                     />
                 </Modal>
                 <Modal
-                    onCancel={() => setIsBackgroundChoosingModalOpen(false)}
+                    onCancel={() => {
+                        setIsBackgroundChoosingModalOpen(false)
+                        setTemporaryBackgroundColor(null)
+                    }}
                     onOk={() => {
                         setIsBackgroundChoosingModalOpen(false)
                         setThemeColor(temporaryBackgroundColor || "violet")

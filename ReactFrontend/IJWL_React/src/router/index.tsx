@@ -12,8 +12,6 @@ import TestHistory from "../RightSideMainView/TestHistory";
 import WordList from "../RightSideMainView/WordList";
 
 
-
-
 const router = createBrowserRouter([
     {
         path: "/",
@@ -54,13 +52,14 @@ const router = createBrowserRouter([
         ],
     },
     {
-        path: "/login",
+        path: "login",
         element: <Login />,
     },
     {
-        path: "/register",
+        path: "register",
         element: <Register />,
     },
-]);
+],
+);
 
-export default router;
+export default router

@@ -1,6 +1,6 @@
 import React from 'react';
 import type { FormProps } from 'antd';
-import { Button, Divider, Form, Input, message } from 'antd';
+import { Button, Divider, Form, Input, message, theme } from 'antd';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useUserStatusStore } from '../stores/useUserStatusStore';
@@ -15,6 +15,12 @@ const Register: React.FC = () => {
     const userStatus = useUserStatusStore((state) => state);
 
     const navigate = useNavigate();
+
+        const {
+        token: {
+            colorPrimaryBg,
+        },
+    } = theme.useToken();
 
     const onFinish: FormProps<FieldType>['onFinish'] = (values) => {
         async function RegisterUser() {
@@ -88,7 +94,8 @@ const Register: React.FC = () => {
     return (
         <div style={{
             display: 'flex', justifyContent: 'center',
-            alignItems: 'center', height: '100vh'
+            alignItems: 'center', height: '100vh',
+            backgroundColor: colorPrimaryBg
         }}>
 
             {contextHolder}
