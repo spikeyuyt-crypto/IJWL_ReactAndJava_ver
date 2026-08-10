@@ -189,7 +189,7 @@ export default function MyProfile() {
                         selectedItem={temporaryAvatar}
                         onSelect={setTemporaryAvatar}
                         renderItem={(avatarKey) => (
-                            <></>
+                            <Avatar></Avatar>
                         )}
                     />
                 </Modal>

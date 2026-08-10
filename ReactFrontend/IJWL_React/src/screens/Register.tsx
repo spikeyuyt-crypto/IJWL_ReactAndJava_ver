@@ -39,22 +39,23 @@ const Register: React.FC = () => {
                     }
                 );
 
-                const data = response.data;
+                const data = response.data.data;
                 console.log(data);
 
                 userStatus.login({
                     userId: data.userId,
-                    userName: data.userName,
+                    userName: values.username ?? '',
                     backgroundColor: data.backgroundColor,
                     fontSize: data.fontSize,
                 });
                 messageApi.success('登録に成功しました。\n 3秒後にホームページにリダイレクトされます。');
-                setTimeout(() => { navigate('/'); }, 3000);
+
+                setTimeout(() => { navigate('/') }, 3000);
             } catch (error) {
                 if (axios.isAxiosError(error)) {
                     const status = error.response?.status;
                     switch (status) {
-                        case 401:
+                        case 409:
                             messageApi.error(
                                 'ユーザー名がすでに存在します',
                             );

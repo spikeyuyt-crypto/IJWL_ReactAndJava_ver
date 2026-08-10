@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.ijwl_javabackend.mapper.A002WordsMapper">
+
+    <select id="getUnitNumbers" resultType="java.lang.String">
+        SELECT DISTINCT category
+        FROM words
+        WHERE category IS NOT NULL
+    </select>
+
+    <select id="getAllWords" resultType="com.example.ijwl_javabackend.entity.A002GetWordsListBean">
+        SELECT word_id, japanese, chinese FROM words
+        WHERE category IN
+        <foreach
+                collection="unitNumbers"
+                item="unitNumber"
+                open="("
+                separator=","
+                close=")">
+            #{unitNumber}
+        </foreach>
+    </select>
+
+    <select id="getBatsuWords" resultType="com.example.ijwl_javabackend.entity.A002GetWordsListBean">
+        SELECT DISTINCT w.word_id, w.japanese, w.chinese FROM words AS w
+        JOIN test_wrong_answers AS tsa ON w.word_id = tsa.word_id
+        WHERE tsa.user_id = #{userId}
+    </select>
+
+    <select id="getMarkedWords" resultType="com.example.ijwl_javabackend.entity.A002GetWordsListBean">
+        SELECT w.word_id, w.japanese, w.chinese FROM words AS w
+        JOIN user_notes AS un ON w.word_id = un.word_id
+        WHERE un.user_id = #{userId}
+    </select>
+
+    <select id="searchWord" resultType="com.example.ijwl_javabackend.entity.A002GetSearchingWordBean">
+        SELECT japanese, chinese FROM words
+        WHERE japanese LIKE CONCAT('%', #{word}, '%')
+        OR chinese LIKE CONCAT('%', #{word}, '%')
+    </select>
+
+    <insert id="markWord">
+        INSERT INTO user_notes (word_id, user_id, memo)
+        VALUES
+        <foreach
+                collection="a002MarkWordDto"
+                item="item"
+                separator=",">
+            (#{item.wordId},
+            #{item.userId},
+            #{item.memo})
+        </foreach>
+    </insert>
+
+    <select id="getComment" resultType="String">
+        SELECT memo FROM user_notes
+        WHERE word_id = #{wordId}
+        AND user_id = #{userId}
+    </select>
+
+    <update id="updateComment">
+        UPDATE user_notes
+        SET memo = #{memo}
+        WHERE word_id = #{wordId}
+        AND user_id = #{userId}
+    </update>
+
+    <delete id="unmarkWord">
+        DELETE FROM user_notes
+        WHERE word_id IN
+        <foreach
+                collection="a002UnmarkAndDeleteWordDto"
+                item="item"
+                open="("
+                separator=","
+                close=")"
+        >
+            #{item.wordId}
+        </foreach>
+        AND user_id = #{a002UnmarkAndDeleteWordDto[0].userId}
+    </delete>
+
+    <delete id="deleteBatsuWord">
+        DELETE FROM test_wrong_answers
+        WHERE word_id IN
+        <foreach
+                collection="a002UnmarkAndDeleteWordDto"
+                item="item"
+                open="("
+                separator=","
+                close=")"
+        >
+            #{item.wordId}
+        </foreach>
+        AND user_id =  #{a002UnmarkAndDeleteWordDto[0].userId}
+    </delete>
+
+    <insert id="recordBatsuWord">
+        INSERT INTO test_wrong_answers (word_id, user_id, session_id)
+        VALUES
+        <foreach
+                collection="a002RecordBatsuWordDto"
+                item="item"
+                separator=","
+        >
+            (#{item.wordId}, #{item.userId}, #{item.sessionId})
+        </foreach>
+    </insert>
+
+</mapper>

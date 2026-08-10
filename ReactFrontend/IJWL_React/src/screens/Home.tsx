@@ -284,7 +284,9 @@ const Home: React.FC = () => {
     if (isLoggedIn) {
         authButtons = (
             <div style={{ display: 'flex', alignItems: 'center', marginRight: '20px' }}>
-                <p style={{ fontSize: '20px', fontWeight: 'bold' }}>{userName + '　さん, こんにちは'}</p>
+                <p style={{ fontSize: '20px', fontWeight: 'bold' }}>
+                    {userName + '　さん, こんにちは'}
+                </p>
             </div>
         );
     } else {

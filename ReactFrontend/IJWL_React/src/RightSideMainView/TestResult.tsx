@@ -88,7 +88,20 @@ export default function TestResult() {
             messageApi.warning('バツ単語はありません');
             return;
         }
+        const markRequestData: Object[] = testItemList
+            .filter(item => !item.judge)
+            .map(item => ({
+                userId: currentUserId,
+                wordId: item.testWord.wordId,
+            }));
         try {
+            axios.post('http://localhost:8080/word/markWord', 
+                markRequestData
+            );
+            messageApi.success('バツ単語のマークに成功しました');
+            setTimeout(() => {
+                navigate('/')
+            }, 3000);
 
         } catch (e) {
             messageApi.error('バツ単語のマークに失敗しました');
@@ -117,7 +130,7 @@ export default function TestResult() {
                     <Popover key={index} content={popoverContent(index)}>
                         <div style={{
                             backgroundColor: item.judge ? "rgb(74, 255, 46)" : " rgb(239, 255, 62)",
-                            display: "flex", 
+                            display: "flex",
                             justifyContent: "center",
                             alignItems: "center",
                             width: "100px", height: "100px", borderRadius: "50%"

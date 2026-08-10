@@ -19,11 +19,13 @@ type UserStatusStore = {
   user: UserStatusInfo | null;
   avatar: AvatarType | null;
   darkMode: boolean;
+  accessToken: string | null;
   login: (user: UserStatusInfo) => void;
   logout: () => void;
   changeAvatar: (avatar: AvatarType) => void;
   switchDarkMode: () => void
   setThemeColor: (color: string) => void
+  setAccessToken: (accessToken: string | null) => void
 }
 
 
@@ -32,6 +34,8 @@ export const useUserStatusStore = create<UserStatusStore>((set) => ({
   user: null,
   avatar: "Icon1",
   darkMode: false,
+  accessToken: null,
+  setAccessToken: (accessToken: string | null) => set({ accessToken }),
   switchDarkMode: () => set((state) => ({ darkMode: !state.darkMode })),
   login: (user: UserStatusInfo) => set({ isLoggedIn: true, user: user }),
   logout: () => set({ isLoggedIn: false, user: null }),
