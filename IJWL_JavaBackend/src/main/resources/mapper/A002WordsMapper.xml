@@ -45,25 +45,25 @@
         INSERT INTO user_notes (word_id, user_id, memo)
         VALUES
         <foreach
-                collection="a002MarkWordDto"
+                collection="insertTargets"
                 item="item"
                 separator=",">
             (#{item.wordId},
-            #{item.userId},
+            #{userId},
             #{item.memo})
         </foreach>
     </insert>
 
     <select id="getComment" resultType="String">
         SELECT memo FROM user_notes
-        WHERE word_id = #{wordId}
+        WHERE word_id = #{a002GetCommentDto.wordId}
         AND user_id = #{userId}
     </select>
 
     <update id="updateComment">
         UPDATE user_notes
-        SET memo = #{memo}
-        WHERE word_id = #{wordId}
+        SET memo = #{a002UpdateCommentDto.memo}
+        WHERE word_id = #{a002UpdateCommentDto.wordId}
         AND user_id = #{userId}
     </update>
 
@@ -79,7 +79,7 @@
         >
             #{item.wordId}
         </foreach>
-        AND user_id = #{a002UnmarkAndDeleteWordDto[0].userId}
+        AND user_id = #{userId}
     </delete>
 
     <delete id="deleteBatsuWord">
@@ -94,18 +94,18 @@
         >
             #{item.wordId}
         </foreach>
-        AND user_id =  #{a002UnmarkAndDeleteWordDto[0].userId}
+        AND user_id =  #{userId}
     </delete>
 
     <insert id="recordBatsuWord">
         INSERT INTO test_wrong_answers (word_id, user_id, session_id)
         VALUES
         <foreach
-                collection="a002RecordBatsuWordDto"
+                collection="insertTargets"
                 item="item"
                 separator=","
         >
-            (#{item.wordId}, #{item.userId}, #{item.sessionId})
+            (#{item.wordId}, #{userId}, #{item.sessionId})
         </foreach>
     </insert>
 

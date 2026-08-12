@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useUserStatusStore } from "../stores/useUserStatusStore";
 import { Button, Popover, message, Popconfirm } from "antd";
 import type { PopconfirmProps } from 'antd';
-import axios from "axios";
+import axiosInstance from "../NetWork/axiosInstance";
 
 
 export default function TestResult() {
@@ -16,7 +16,6 @@ export default function TestResult() {
 
 
     async function recordTest(
-        userId: number | null,
         startedAt: string | null,
         endedAt: string | null,
         score: number,
@@ -30,10 +29,9 @@ export default function TestResult() {
             messageApi.error("テスト時間の情報が不足しています");
             throw new Error("Test time is missing");
         }
-        console.log(userId, startedAt, endedAt, score, wrongWordIds);
+        console.log( startedAt, endedAt, score, wrongWordIds);
         try {
-            await axios.post('http://localhost:8080/test/record', {
-                userId: userId,
+            await axiosInstance.post('/test/record', {
                 startedAt: startedAt,
                 endedAt: endedAt,
                 score: score,
@@ -50,7 +48,6 @@ export default function TestResult() {
     }
     const confirm: PopconfirmProps['onConfirm'] = async () => {
         await recordTest(
-            currentUserId ?? null,
             useTestStore.getState().startedAt,
             useTestStore.getState().endedAt,
             correctAnswerCount * 10,
@@ -91,11 +88,10 @@ export default function TestResult() {
         const markRequestData: Object[] = testItemList
             .filter(item => !item.judge)
             .map(item => ({
-                userId: currentUserId,
                 wordId: item.testWord.wordId,
             }));
         try {
-            axios.post('http://localhost:8080/word/markWord', 
+            axiosInstance.post('/word/markWord', 
                 markRequestData
             );
             messageApi.success('バツ単語のマークに成功しました');

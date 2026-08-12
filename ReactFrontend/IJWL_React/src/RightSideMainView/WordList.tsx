@@ -1,5 +1,5 @@
 import { Button, Table, Flex, message, Modal, Checkbox, Input } from "antd";
-import axios from "axios";
+import axiosInstance from "../NetWork/axiosInstance";
 import type { TableProps } from "antd/es/table";
 import React from "react";
 import { useState, useEffect } from "react";
@@ -35,10 +35,10 @@ export default function WordList() {
 
     const [importantWordIds, setImportantWordIds] = useState<number[]>([]);
 
-    async function getImportantWordIds(userId: number) {
+    async function getImportantWordIds() {
         const importantResponse =
-            await axios.get<ImportantWordsResponse>(
-                `http://localhost:8080/word/getMarkedWords/${userId}`,
+            await axiosInstance.get<ImportantWordsResponse>(
+                `/word/getMarkedWords`,
             );
 
         return importantResponse.data.data.map(
@@ -59,7 +59,7 @@ export default function WordList() {
                 }
                 const defaultResponse =
 
-                    await axios.post('http://localhost:8080/word/getAllWords',
+                    await axiosInstance.post('/word/getAllWords',
                         { unitNumbers: unitNumbers });
                 return defaultResponse.data.data;
 
@@ -69,7 +69,7 @@ export default function WordList() {
                     return [];
                 }
                 const batsuresponse =
-                    await axios.get(`http://localhost:8080/word/getBatsuWords/${userId}`);
+                    await axiosInstance.get(`/word/getBatsuWords`);
                 return batsuresponse.data.data;
 
             case WordListStatus.important:
@@ -78,7 +78,7 @@ export default function WordList() {
                     return [];
                 }
                 const importantResponse =
-                    await axios.get(`http://localhost:8080/word/getMarkedWords/${userId}`);
+                    await axiosInstance.get(`/word/getMarkedWords`);
                 return importantResponse.data.data;
         }
     }
@@ -227,11 +227,6 @@ export default function WordList() {
         });
     };
 
-    interface MarkWordRequest {
-        wordId: number;
-        userId: number;
-    }
-
     async function markWords(wordIds: number[]) {
         if (userId === null) {
             messageApi.warning("ログインしてください");
@@ -243,17 +238,13 @@ export default function WordList() {
             return;
         }
 
-        const requestBody: MarkWordRequest[] = wordIds.map((wordId) => ({
-            wordId,
-            userId,
-        }));
 
         try {
-            await axios.post(
-                "http://localhost:8080/word/markWord",
-                requestBody,
+            await axiosInstance.post(
+                "/word/markWord",
+                wordIds.map((wordId) => ({ wordId })),
             ).then(() => {
-                getImportantWordIds(userId)
+                getImportantWordIds()
                     .then((ids) => { setImportantWordIds(ids); })
             });
 
@@ -273,17 +264,13 @@ export default function WordList() {
             return;
         }
 
-        const requestBody: MarkWordRequest[] = wordIds.map((wordId) => ({
-            wordId,
-            userId,
-        }));
 
         try {
-            await axios.delete(
-                "http://localhost:8080/word/unmarkWord",
-                { data: requestBody },
+            await axiosInstance.delete(
+                "/word/unmarkWord",
+                { data: wordIds.map((wordId) => ({ wordId })) },
             ).then(() => {
-                getImportantWordIds(userId)
+                getImportantWordIds()
                     .then((ids) => { setImportantWordIds(ids); })
             })
 
@@ -304,16 +291,12 @@ export default function WordList() {
             return;
         }
 
-        const requestBody: MarkWordRequest[] = wordIds.map((wordId) => ({
-            wordId,
-            userId,
-        }))
         try {
-            await axios.delete(
-                "http://localhost:8080/word/deleteBatsuWord",
-                { data: requestBody },
+            await axiosInstance.delete(
+                "/word/deleteBatsuWord",
+                { data: wordIds.map((wordId) => ({ wordId })) },
             ).then(() => {
-                axios.get(`http://localhost:8080/word/getBatsuWords/${userId}`)
+                axiosInstance.get(`/word/getBatsuWords/`)
                     .then((response) => {
                         setDisplayWordList(response.data.data);
                     })
@@ -343,7 +326,7 @@ export default function WordList() {
                 setDisplayWordList(gotWordList ?? []);
 
                 if (userId !== null) {
-                    const ids = await getImportantWordIds(userId);
+                    const ids = await getImportantWordIds();
                     setImportantWordIds(ids);
                 } else {
                     setImportantWordIds([]);
@@ -368,8 +351,9 @@ export default function WordList() {
             messageApi.warning("ログインしてください");
             return;
         }
-        axios.put("http://localhost:8080/word/updateComment",
-            { wordId, userId, memo })
+        axiosInstance.put("/word/updateComment",
+            { data: { wordId: wordId, memo: memo } },
+        )
             .then(() => {
                 messageApi.success("メモを更新しました");
             })
@@ -385,8 +369,8 @@ export default function WordList() {
         }
 
         try {
-            await axios.post("http://localhost:8080/word/comment",
-                { wordId, userId })
+            await axiosInstance.post("/word/comment",
+                { wordId })
                 .then((response) => {
                     setDbMemo(response.data.data.memo);
                 });

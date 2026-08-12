@@ -5,6 +5,9 @@ import { ConfigProvider, theme } from 'antd';
 import "./css/globalCss.css";
 import router from './router/index';
 import { useUserStatusStore } from './stores/useUserStatusStore';
+import axios from 'axios';
+import { useEffect } from 'react';
+import axiosInstance from './NetWork/axiosInstance';
 
 const themeColorMap: Record<string, string> = {
   violet: '#7C3AED',
@@ -23,20 +26,70 @@ function AppProvider() {
   const themeColor =
     themeColorMap[savedTheme ?? 'violet'] ?? '#7C3AED';
 
-  return (
-    <ConfigProvider
-      theme={{
-        algorithm: darkMode
-          ? theme.darkAlgorithm
-          : theme.defaultAlgorithm,
+  function AuthInitializer() {
+    const accessToken = useUserStatusStore(
+      (state) => state.accessToken
+    );
 
-        token: {
-          colorPrimary: themeColor,
-        },
-      }}
-    >
-      <RouterProvider router={router} />
-    </ConfigProvider>
+    const login = useUserStatusStore(
+      (state) => state.login
+    );
+
+    const logout = useUserStatusStore(
+      (state) => state.logout
+    );
+
+    useEffect(() => {
+      if (!accessToken) {
+        return;
+      }
+
+      async function restoreLogin() {
+        try {
+          const response = await axiosInstance.get(
+            '/users/reSignIn',
+          );
+
+          const user = response.data.data;
+
+          login({
+            userId: Number(user.userId),
+            userName: user.userName,
+            backgroundColor: user.backgroundColor,
+            fontSize: user.fontSize,
+          });
+        } catch (error) {
+          if (axios.isCancel(error)) {
+            return;
+          }
+
+          logout();
+        }
+      }
+
+      restoreLogin();
+    }, [accessToken, login, logout]);
+
+    return null;
+  }
+
+  return (
+    <>
+      <AuthInitializer />
+      <ConfigProvider
+        theme={{
+          algorithm: darkMode
+            ? theme.darkAlgorithm
+            : theme.defaultAlgorithm,
+
+          token: {
+            colorPrimary: themeColor,
+          },
+        }}
+      >
+        <RouterProvider router={router} />
+      </ConfigProvider>
+    </>
   );
 }
 

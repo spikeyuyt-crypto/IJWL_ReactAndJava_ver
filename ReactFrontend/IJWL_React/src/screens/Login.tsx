@@ -17,6 +17,8 @@ const Login: React.FC = () => {
 
     const navigate = useNavigate();
 
+    const setAccessToken = useUserStatusStore((state) => state.setAccessToken);
+
     
 
     const {
@@ -38,7 +40,10 @@ const Login: React.FC = () => {
                 );
 
                 const data = response.data.data;
+                
                 console.log(data);
+
+                setAccessToken(data.accessToken);
 
                 userStatus.login({
                     userId: data.userId,

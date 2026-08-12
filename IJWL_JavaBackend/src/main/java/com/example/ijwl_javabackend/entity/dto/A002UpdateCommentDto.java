@@ -1,8 +1,8 @@
 package com.example.ijwl_javabackend.entity.dto;
 
-public class A002MarkWordDto {
+public class A002UpdateCommentDto {
     private int wordId;
-    private String memo = null;
+    private String memo;
 
     public int getWordId() {
         return wordId;
@@ -11,7 +11,6 @@ public class A002MarkWordDto {
     public void setWordId(int wordId) {
         this.wordId = wordId;
     }
-
 
     public String getMemo() {
         return memo;

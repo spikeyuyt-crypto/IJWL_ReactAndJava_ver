@@ -4,7 +4,7 @@ import { useUserStatusStore, type AvatarType } from "../stores/useUserStatusStor
 import { avatarIconMap } from "../screens/Home.tsx";
 import { useState } from "react";
 import React from "react";
-import axios from "axios";
+import axiosInstance from "../NetWork/axiosInstance";
 
 
 type SelectableListProps<T> = {
@@ -117,14 +117,13 @@ export default function MyProfile() {
 
     async function upgradeUserSettings(
         color: string | null,
-        fontSize: string | null,
-        userId: number | null) {
+        fontSize: string | null
+    ) {
 
         try {
-            await axios.put('http://localhost:8080/settings/update', {
+            await axiosInstance.put('/settings/update', {
                 backgroundColor: color,
-                fontSize: fontSize,
-                userId: userId
+                fontSize: fontSize
             });
             messageApi.success('設定を更新しました');
         } catch (error) {
@@ -201,7 +200,7 @@ export default function MyProfile() {
                     onOk={() => {
                         setIsBackgroundChoosingModalOpen(false)
                         setThemeColor(temporaryBackgroundColor || "violet")
-                        upgradeUserSettings(temporaryBackgroundColor, temporaryFont, userId)
+                        upgradeUserSettings(temporaryBackgroundColor, temporaryFont)
                     }}
                     open={isBackgroundChoosingModalOpen}
                     okText="変更"

@@ -21,4 +21,5 @@ public interface A001SignInAndRegisterMapper {
             @Param("backgroundColor") String backgroundColor);
 
 
+    A001LogInListBean getUserSettingsById(int userId);
 }

@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 export type AvatarType =
   | 'Icon1'
@@ -29,29 +30,39 @@ type UserStatusStore = {
 }
 
 
-export const useUserStatusStore = create<UserStatusStore>((set) => ({
-  isLoggedIn: false,
-  user: null,
-  avatar: "Icon1",
-  darkMode: false,
-  accessToken: null,
-  setAccessToken: (accessToken: string | null) => set({ accessToken }),
-  switchDarkMode: () => set((state) => ({ darkMode: !state.darkMode })),
-  login: (user: UserStatusInfo) => set({ isLoggedIn: true, user: user }),
-  logout: () => set({ isLoggedIn: false, user: null }),
-  changeAvatar: (avatar: AvatarType) => set({ avatar }),
-  setThemeColor: (color: string) => set((state) => ({
-    user: state.user
-      ? {
-        ...state.user,
-        backgroundColor: color
-      }
-      : {
-        userId: null,
-        userName: null,
-        fontSize: null,
-        backgroundColor: color,
-      }
+export const useUserStatusStore = create<UserStatusStore>()(
+  persist(
+    (set) => ({
+      isLoggedIn: false,
+      user: null,
+      avatar: "Icon1",
+      darkMode: false,
+      accessToken: null,
 
-  }))
-}));
+      setAccessToken: (accessToken: string | null) => set({ accessToken }),
+      switchDarkMode: () => set((state) => ({ darkMode: !state.darkMode })),
+      login: (user: UserStatusInfo) => set({ isLoggedIn: true, user: user }),
+      logout: () => set({ isLoggedIn: false, user: null, accessToken: null }),
+      changeAvatar: (avatar: AvatarType) => set({ avatar }),
+      setThemeColor: (color: string) => set((state) => ({
+        user: state.user
+          ? {
+            ...state.user,
+            backgroundColor: color
+          }
+          : {
+            userId: null,
+            userName: null,
+            fontSize: null,
+            backgroundColor: color,
+          }
+      }))
+    }),
+    {
+      name: 'userStatusStore',
+      partialize: (state) => ({
+        accessToken: state.accessToken,
+      })
+    }
+  )
+);

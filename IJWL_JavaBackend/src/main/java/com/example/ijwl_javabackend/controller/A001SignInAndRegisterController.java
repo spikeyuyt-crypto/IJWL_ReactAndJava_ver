@@ -2,11 +2,10 @@ package com.example.ijwl_javabackend.controller;
 
 import com.example.ijwl_javabackend.entity.ApiResponse;
 import com.example.ijwl_javabackend.entity.dto.A001RegDto;
+import com.example.ijwl_javabackend.entity.dto.A001SignInDto;
 import com.example.ijwl_javabackend.service.A001SignInAndRegisterService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 import com.example.ijwl_javabackend.entity.A001LogInListBean;
 
@@ -23,13 +22,12 @@ public class A001SignInAndRegisterController {
 
     @PostMapping("/signIn")
     public ResponseEntity<ApiResponse<A001LogInListBean>> signIn(
-            String username,
-            String password
+            @RequestBody A001SignInDto a001SignInDto
     ) {
 
         A001LogInListBean userSettings = a001SignInAndRegisterService.signIn(
-                username,
-                password
+                a001SignInDto.getUsername(),
+                a001SignInDto.getPassword()
         );
 
         return ResponseEntity.ok(
@@ -39,10 +37,28 @@ public class A001SignInAndRegisterController {
                 ));
     }
 
-    @PostMapping
+    @GetMapping("reSignIn")
+    public ResponseEntity<ApiResponse<A001LogInListBean>> reSignIn(
+            HttpServletRequest request
+    ) {
+        Integer userId = (Integer) request.getAttribute("userId");
+
+        A001LogInListBean userSettings = a001SignInAndRegisterService.reSignIn(
+                userId
+        );
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        "success",
+                        userSettings
+                ));
+    }
+
+
+    @PostMapping("/register")
     public ResponseEntity<ApiResponse<A001LogInListBean>> register(
-          @RequestBody A001RegDto a001RegDto
-    ){
+            @RequestBody A001RegDto a001RegDto
+    ) {
         A001LogInListBean userSettings = a001SignInAndRegisterService.register(
                 a001RegDto
         );

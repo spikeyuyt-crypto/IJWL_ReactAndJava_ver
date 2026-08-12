@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useUserStatusStore } from "../stores/useUserStatusStore";
 import { useWordListStatusStore } from "../stores/useWordListStatusStore";
 import { Button, Modal, Checkbox } from 'antd';
-import axios from "axios";
+import axiosInstance from "../NetWork/axiosInstance";
 
 export default function Learning() {
 
@@ -114,10 +114,9 @@ export default function Learning() {
         }
         const data = {
             wordId: wordId,
-            userId: userId,
         };
         try {
-            await axios.post('http://localhost:8080/word/markWord', [data], {
+            await axiosInstance.post('/word/markWord', [data], {
                 headers: {
                     'Content-Type': 'application/json',
                 },

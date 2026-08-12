@@ -2,8 +2,9 @@ package com.example.ijwl_javabackend.mapper;
 
 import com.example.ijwl_javabackend.entity.A002GetSearchingWordBean;
 import com.example.ijwl_javabackend.entity.A002GetWordsListBean;
-import com.example.ijwl_javabackend.entity.dto.A002GetWordsRequestDto;
+import com.example.ijwl_javabackend.entity.dto.*;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -17,5 +18,22 @@ public interface A002WordsMapper {
 
     List<A002GetWordsListBean> getMarkedWords(int userId);
 
-    List<A002GetSearchingWordBean> getSearchingWords(String word);
+    List<A002GetSearchingWordBean> searchWord(String word);
+
+    int markWord(@Param("insertTargets") List<A002MarkWordDto> insertTargets,
+                 @Param("userId") int userId);
+
+    String getComment(@Param("a002GetCommentDto") A002GetCommentDto a002GetCommentDto,
+                      @Param("userId") int userId);
+
+    int updateComment(@Param("a002UpdateCommentDto") A002UpdateCommentDto a002UpdateCommentDto,
+                      @Param("userId") int userId);
+
+    int unmarkWord(@Param("a002UnmarkAndDeleteWordDto") List<A002UnmarkAndDeleteWordDto> a002UnmarkAndDeleteWordDto,
+                   @Param("userId") int userId);
+
+    int deleteBatsuWord(@Param("a002UnmarkAndDeleteWordDto") List<A002UnmarkAndDeleteWordDto> a002UnmarkAndDeleteWordDto,
+                        @Param("userId") Integer userId);
+
+    int recordBatsuWord(List<A002RecordBatsuWordDto> insertTargets, @Param("userId") int userId);
 }

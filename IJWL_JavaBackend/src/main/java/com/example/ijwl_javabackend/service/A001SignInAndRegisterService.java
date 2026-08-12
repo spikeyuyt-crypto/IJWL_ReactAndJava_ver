@@ -7,6 +7,7 @@ import com.example.ijwl_javabackend.mapper.A001SignInAndRegisterMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.example.ijwl_javabackend.security.JwtUtil;
 
 @Service
 public class A001SignInAndRegisterService {
@@ -14,13 +15,21 @@ public class A001SignInAndRegisterService {
 
     private final PasswordEncoder passwordEncoder;
 
+    private final JwtUtil jwtUtil;
+
     public A001SignInAndRegisterService(
             A001SignInAndRegisterMapper a001SignInAndRegisterMapper,
-            PasswordEncoder passwordEncoder
+            PasswordEncoder passwordEncoder,
+            JwtUtil jwtUtil
 
     ) {
         this.a001SignInAndRegisterMapper = a001SignInAndRegisterMapper;
         this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil;
+    }
+
+    private String generateAccessToken(String userId) {
+        return jwtUtil.generateAccessToken(userId);
     }
 
     public A001LogInListBean signIn(String username, String password) {
@@ -34,7 +43,13 @@ public class A001SignInAndRegisterService {
             throw new BusinessException(401, "パスワードが違います");
         }
 
-        return a001SignInAndRegisterMapper.getUserSettings(username);
+        A001LogInListBean userInfo = a001SignInAndRegisterMapper.getUserSettings(username);
+
+        String accessToken = generateAccessToken(userInfo.getUserId());
+
+        userInfo.setAccessToken(accessToken);
+
+        return userInfo;
     }
 
     @Transactional
@@ -84,5 +99,9 @@ public class A001SignInAndRegisterService {
         }
 
         return a001SignInAndRegisterMapper.getUserSettings(a001RegDto.getUsername());
+    }
+
+    public A001LogInListBean reSignIn(int userId) {
+        return a001SignInAndRegisterMapper.getUserSettingsById(userId);
     }
 }
