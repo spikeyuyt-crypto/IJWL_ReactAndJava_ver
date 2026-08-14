@@ -6,7 +6,7 @@ import { useWordListStatusStore } from '../stores/useWordListStatusStore';
 import '../css/Home.css';
 import { Input, } from 'antd';
 import type { GetProps } from 'antd';
-import axios from 'axios';
+import axiosInstance from '../NetWork/axiosInstance';
 import { WordListStatus } from '../stores/useWordListStatusStore';
 import { IoMdSunny } from "react-icons/io";
 import { PiMoonLight } from "react-icons/pi";
@@ -149,8 +149,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
         }
 
         try {
-            const response = await axios.post(
-                "http://localhost:8080/word/searchWord",
+            const response = await axiosInstance.post(
+                "/word/searchWord",
                 searchValue,
                 {
                     headers: {
@@ -269,8 +269,8 @@ const Home: React.FC = () => {
     useEffect(() => {
         async function getAvailableUnitNumbers() {
             try {
-                const response = await axios.get<GetUnitNumbersApiResponse>(
-                    "http://localhost:8080/word/getUnitNumbers"
+                const response = await axiosInstance.get<GetUnitNumbersApiResponse>(
+                    "/word/getUnitNumbers"
                 );
                 setAvailableUnitNumbers(response.data.data.map(Number));
             } catch (error) {
@@ -337,7 +337,6 @@ const Home: React.FC = () => {
                     theme={{
                         components: {
                             Menu: {
-                                algorithm: true,
                                 itemHeight: 65,
                                 iconSize: 30,
                                 collapsedIconSize: 40,
@@ -354,7 +353,6 @@ const Home: React.FC = () => {
                         className="home-menu"
                         theme="dark"
                         mode="inline"
-                        defaultSelectedKeys={['1']}
                         selectedKeys={[currentKey]}
                         items={[
                             {

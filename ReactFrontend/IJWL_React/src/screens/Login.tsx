@@ -51,6 +51,7 @@ const Login: React.FC = () => {
                     backgroundColor: data.backgroundColor,
                     fontSize: data.fontSize,
                 });
+
                 messageApi.success('ログインに成功しました。\n 3秒後にホームページにリダイレクトされます。');
                 setTimeout(() => { navigate('/'); }, 3000);
             } catch (error) {

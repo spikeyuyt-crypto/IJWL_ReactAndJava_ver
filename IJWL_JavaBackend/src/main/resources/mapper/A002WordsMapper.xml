@@ -60,12 +60,20 @@
         AND user_id = #{userId}
     </select>
 
-    <update id="updateComment">
-        UPDATE user_notes
-        SET memo = #{a002UpdateCommentDto.memo}
-        WHERE word_id = #{a002UpdateCommentDto.wordId}
-        AND user_id = #{userId}
-    </update>
+    <insert id="updateComment">
+        INSERT INTO user_notes (
+        user_id,
+        word_id,
+        memo
+    )
+    VALUES (
+        #{userId},
+        #{a002UpdateCommentDto.wordId},
+        #{a002UpdateCommentDto.memo}
+    )
+    ON DUPLICATE KEY UPDATE
+        memo = #{a002UpdateCommentDto.memo}
+    </insert>
 
     <delete id="unmarkWord">
         DELETE FROM user_notes

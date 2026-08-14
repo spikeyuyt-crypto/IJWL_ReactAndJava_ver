@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.ijwl_javabackend.mapper.A004TestMapper">
+
+    <insert id="recordTest"
+            useGeneratedKeys="true"
+            keyProperty="a004TestDto.sessionId"
+            keyColumn="session_id">
+
+        INSERT INTO test_sessions (user_id, started_at, ended_at, score)
+        VALUES (#{userId}, #{a004TestDto.startedAt}, #{a004TestDto.endedAt}, #{a004TestDto.score})
+
+    </insert>
+
+    <select id="showTestScore" resultType="com.example.ijwl_javabackend.entity.A004ShowTestScoreListBean">
+        SELECT ended_at, score, session_id
+        FROM test_sessions
+        WHERE user_id = #{userId}
+        ORDER BY ended_at DESC LIMIT 5
+    </select>
+
+
+</mapper>

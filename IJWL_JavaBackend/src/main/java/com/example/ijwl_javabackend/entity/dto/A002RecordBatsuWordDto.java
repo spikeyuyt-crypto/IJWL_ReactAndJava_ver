@@ -4,6 +4,11 @@ public class A002RecordBatsuWordDto {
    private int wordId;
    private Integer sessionId = null;
 
+    public A002RecordBatsuWordDto(int wordId, Integer sessionId) {
+        this.wordId = wordId;
+        this.sessionId = sessionId;
+    }
+
    public int getWordId() {
       return wordId;
    }

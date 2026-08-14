@@ -187,7 +187,7 @@ export default function MyProfile() {
                         items={Object.keys(avatarIconMap) as AvatarType[]}
                         selectedItem={temporaryAvatar}
                         onSelect={setTemporaryAvatar}
-                        renderItem={(avatarKey) => (
+                        renderItem={(fontKey) => (
                             <Avatar></Avatar>
                         )}
                     />
@@ -200,7 +200,7 @@ export default function MyProfile() {
                     onOk={() => {
                         setIsBackgroundChoosingModalOpen(false)
                         setThemeColor(temporaryBackgroundColor || "violet")
-                        upgradeUserSettings(temporaryBackgroundColor, temporaryFont)
+                        upgradeUserSettings(temporaryBackgroundColor, null)
                     }}
                     open={isBackgroundChoosingModalOpen}
                     okText="変更"

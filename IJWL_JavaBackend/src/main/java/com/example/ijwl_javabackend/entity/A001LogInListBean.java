@@ -2,9 +2,9 @@ package com.example.ijwl_javabackend.entity;
 
 public class A001LogInListBean {
     private String userId;
-    private String userPassword;
+    private String backgroundColor;
+    private String fontSize;
     private String userName;
-    private String userRole;
     private String accessToken;
 
     public String getAccessToken() {
@@ -23,13 +23,7 @@ public class A001LogInListBean {
         this.userId = userId;
     }
 
-    public String getUserPassword() {
-        return userPassword;
-    }
 
-    public void setUserPassword(String userPassword) {
-        this.userPassword = userPassword;
-    }
 
     public String getUserName() {
         return userName;
@@ -39,11 +33,21 @@ public class A001LogInListBean {
         this.userName = userName;
     }
 
-    public String getUserRole() {
-        return userRole;
+    public String getBackgroundColor() {
+        return backgroundColor;
     }
 
-    public void setUserRole(String userRole) {
-        this.userRole = userRole;
+    public void setBackgroundColor(String backgroundColor) {
+        this.backgroundColor = backgroundColor;
     }
+
+    public String getFontSize() {
+        return fontSize;
+    }
+
+    public void setFontSize(String fontSize) {
+        this.fontSize = fontSize;
+    }
+
+    
 }
