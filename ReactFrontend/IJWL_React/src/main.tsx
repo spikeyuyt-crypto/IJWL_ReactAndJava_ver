@@ -1,12 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';
-import { ConfigProvider,Spin, theme } from 'antd';
+import { ConfigProvider, Spin, theme } from 'antd';
 import "./css/globalCss.css";
 import router from './router/index';
 import { useUserStatusStore } from './stores/useUserStatusStore';
 import axios from 'axios';
-import { useEffect,useState } from 'react';
+import { useEffect, useState } from 'react';
 import axiosInstance from './NetWork/axiosInstance';
 
 const themeColorMap: Record<string, string> = {
@@ -25,23 +25,36 @@ function AuthInitializer() {
     (state) => state.login
   );
 
-  const logout = useUserStatusStore(
-    (state) => state.logout
-  );
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
 
-   const [isAuthLoading, setIsAuthLoading] = useState(true);
-
-
+  // 启动流程
   useEffect(() => {
-    if (!accessToken) {
-      setIsAuthLoading(false);
-      return;
-    }
-
     async function restoreLogin() {
       try {
+
+        let currentAccessToken = accessToken;
+        if (!currentAccessToken) {
+          const refreshResponse = await axios.post(
+            'http://localhost:8080/users/refresh',
+            {},
+            {
+              withCredentials: true,
+            }
+          );
+          
+          currentAccessToken = refreshResponse.data.data;
+
+          if (!currentAccessToken) {
+            return;
+          }
+
+          useUserStatusStore
+            .getState()
+            .setAccessToken(currentAccessToken);
+        }
+
         const response = await axiosInstance.get(
-          '/users/reSignIn',
+          '/users/getUserInfoByAccessToken'
         );
 
         const user = response.data.data;
@@ -56,16 +69,16 @@ function AuthInitializer() {
         if (axios.isCancel(error)) {
           return;
         }
-        logout();
-      }finally {
-         setIsAuthLoading(false);
+
+      } finally {
+        setIsAuthLoading(false);
       }
     }
 
     restoreLogin();
-  }, [accessToken, login, logout]);
+  }, []);
 
-   if (isAuthLoading) {
+  if (isAuthLoading) {
     return (
       <div
         style={{

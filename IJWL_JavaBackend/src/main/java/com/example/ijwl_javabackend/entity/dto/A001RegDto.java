@@ -6,6 +6,7 @@ public class A001RegDto {
     private String password;
     private String fontSize = "16";
     private String backgroundColor = "violet";
+    
 
     public Integer getUserId() {
         return userId;
@@ -46,4 +47,6 @@ public class A001RegDto {
     public void setBackgroundColor(String backgroundColor) {
         this.backgroundColor = backgroundColor;
     }
+
+    
 }

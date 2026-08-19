@@ -1,4 +1,4 @@
-import { Button, Checkbox, Modal, message } from "antd";
+import { Button, Checkbox, Modal, message, Card } from "antd";
 import { useNavigate } from "react-router-dom";
 import { useWordListStatusStore } from "../stores/useWordListStatusStore";
 
@@ -6,6 +6,16 @@ import { useWordListStatusStore } from "../stores/useWordListStatusStore";
 
 
 export default function ScopeChoosing() {
+
+    const cardStyle: React.CSSProperties = {
+        width: 250,
+        height: 150,
+        alignItems: "center",
+        justifyContent: "center",
+        display: "flex",
+        borderRadius: "50px",
+        cursor: "pointer",
+    };
 
     const navigate = useNavigate();
 
@@ -76,13 +86,45 @@ export default function ScopeChoosing() {
 
     return (
         <>
-            <Button type="primary" onClick={openScopeChoosingModal}>範囲選択</Button>
-            <Button type="default" onClick={() => navigate('/')}>キャンセル</Button>
-            {modalHolder}
-            {contextHolder}
-            <Button type="primary" onClick={() => setTimeout(() => navigate('/test'),500)}
-                disabled={selectedUnits === null}>
-                    確認</Button>
+            <div style={{ height: '10vh' }}>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+                <Card
+                    style={{
+                        ...cardStyle,
+                        backgroundColor: "#3B82F6",
+                    }}
+                    onClick={() => openScopeChoosingModal()}
+                >
+                    <h1 style={{ color: "#fff" }}>範囲選択</h1>
+                </Card>
+            </div>
+            <div style={{ height: '10vh' }}>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+                <Card
+                    style={{
+                        ...cardStyle,
+                        backgroundColor: "#F59E0B",
+                        marginRight: '100px'
+                    }}
+                    onClick={() => navigate('/')}
+                >
+                    <h1 style={{ color: "#fff" }}>キャンセル</h1>
+                </Card>
+                {modalHolder}
+                {contextHolder}
+                <Card
+                    style={{
+                        ...cardStyle,
+                        backgroundColor: "#EC4899",
+                    }}
+                    onClick={() => setTimeout(() => navigate('/test'), 500)}
+                >
+                    <h1 style={{ color: "#fff" }}>確認</h1>
+                </Card>
+            </div>
         </>
     )
 }

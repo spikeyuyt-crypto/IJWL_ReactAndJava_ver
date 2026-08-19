@@ -95,10 +95,6 @@ export default function TestResult() {
                 markRequestData
             );
             messageApi.success('バツ単語のマークに成功しました');
-            setTimeout(() => {
-                navigate('/')
-            }, 3000);
-
         } catch (e) {
             messageApi.error('バツ単語のマークに失敗しました');
         }

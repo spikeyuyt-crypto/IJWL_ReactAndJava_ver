@@ -12,11 +12,14 @@ type FieldType = {
 };
 
 const Register: React.FC = () => {
-    const userStatus = useUserStatusStore((state) => state);
+    const setUserStatus = useUserStatusStore((state) => state);
+
+    const setAccessToken = useUserStatusStore((state) => state.setAccessToken);
+
 
     const navigate = useNavigate();
 
-        const {
+    const {
         token: {
             colorPrimaryBg,
         },
@@ -42,11 +45,14 @@ const Register: React.FC = () => {
                 const data = response.data.data;
                 console.log(data);
 
-                userStatus.login({
+                setAccessToken(data.accessToken);
+
+                setUserStatus.login({
                     userId: data.userId,
                     userName: values.username ?? '',
                     backgroundColor: data.backgroundColor,
                     fontSize: data.fontSize,
+
                 });
                 messageApi.success('登録に成功しました。\n 3秒後にホームページにリダイレクトされます。');
 
@@ -82,7 +88,10 @@ const Register: React.FC = () => {
                 );
             }
         }
-        RegisterUser();
+        RegisterUser().then(() => {
+
+
+        });
     };
 
     const [messageApi, contextHolder] = message.useMessage();
@@ -140,23 +149,23 @@ const Register: React.FC = () => {
                     label="パスワード確認"
                     name="confirmPassword"
                     dependencies={['password']}
-                    rules={[{required: true,message: 'パスワードを再入力してください', },
-                        ({ getFieldValue }) => ({
-                            validator(_, value) {
-                                if (
-                                    !value ||
-                                    getFieldValue('password') === value
-                                ) {
-                                    return Promise.resolve();
-                                }
+                    rules={[{ required: true, message: 'パスワードを再入力してください', },
+                    ({ getFieldValue }) => ({
+                        validator(_, value) {
+                            if (
+                                !value ||
+                                getFieldValue('password') === value
+                            ) {
+                                return Promise.resolve();
+                            }
 
-                                return Promise.reject(
-                                    new Error(
-                                        'パスワードが一致していません',
-                                    ),
-                                );
-                            },
-                        }),
+                            return Promise.reject(
+                                new Error(
+                                    'パスワードが一致していません',
+                                ),
+                            );
+                        },
+                    }),
                     ]}
                 >
                     <Input.Password />

@@ -101,6 +101,7 @@ export default function WordList() {
             title: '単語ID',
             dataIndex: 'wordId',
             key: 'wordId',
+            sorter: (a, b) => a.wordId - b.wordId
         },
         {
             title: '日本語',
@@ -352,7 +353,7 @@ export default function WordList() {
             return;
         }
         axiosInstance.put("/word/updateComment",
-            { data: { wordId: wordId, memo: memo } },
+            { wordId: wordId, memo: memo  },
         )
             .then(() => {
                 messageApi.success("メモを更新しました");
@@ -452,7 +453,8 @@ export default function WordList() {
                 </Button>
 
                 <Button type="primary"
-                    onClick={openScopeChoosingModal} >
+                    onClick={openScopeChoosingModal} 
+                    style={{ visibility: wordListStatus === WordListStatus.default ? "visible" : "hidden" }}>
                     範囲選択
                 </Button>
             </div>
@@ -462,6 +464,7 @@ export default function WordList() {
                         rowKey="wordId"
                         rowSelection={rowSelection}
                         columns={columns}
+                        showSorterTooltip={false}
                         dataSource={displayWordList}
                         pagination={{
                             pageSize: currentPageSize,

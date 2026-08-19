@@ -2,12 +2,16 @@ package com.example.ijwl_javabackend.service;
 
 import com.example.ijwl_javabackend.entity.A001LogInListBean;
 import com.example.ijwl_javabackend.entity.dto.A001RegDto;
+import com.example.ijwl_javabackend.entity.dto.A001SignInResult;
 import com.example.ijwl_javabackend.exceptionHandler.BusinessException;
 import com.example.ijwl_javabackend.mapper.A001SignInAndRegisterMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.example.ijwl_javabackend.security.JwtUtil;
+import java.util.concurrent.TimeUnit;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import com.example.ijwl_javabackend.entity.A001ReissueToken;
 
 @Service
 public class A001SignInAndRegisterService {
@@ -17,22 +21,28 @@ public class A001SignInAndRegisterService {
 
     private final JwtUtil jwtUtil;
 
+    private final StringRedisTemplate stringRedisTemplate;
+
     public A001SignInAndRegisterService(
             A001SignInAndRegisterMapper a001SignInAndRegisterMapper,
             PasswordEncoder passwordEncoder,
-            JwtUtil jwtUtil
-
-    ) {
+            JwtUtil jwtUtil,
+            StringRedisTemplate stringRedisTemplate) {
         this.a001SignInAndRegisterMapper = a001SignInAndRegisterMapper;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
+        this.stringRedisTemplate = stringRedisTemplate;
     }
 
     private String generateAccessToken(String userId) {
         return jwtUtil.generateAccessToken(userId);
     }
 
-    public A001LogInListBean signIn(String username, String password) {
+    private String generateRefreshToken(String userId) {
+        return jwtUtil.generateRefreshToken(userId);
+    }
+
+    public A001SignInResult signIn(String username, String password) {
         String userPassword = a001SignInAndRegisterMapper.getUserPassword(username);
 
         if (userPassword == null) {
@@ -47,9 +57,13 @@ public class A001SignInAndRegisterService {
 
         String accessToken = generateAccessToken(userInfo.getUserId());
 
+        String refreshToken = generateRefreshToken(userInfo.getUserId());
+
+        stringRedisTemplate.opsForValue().set("refreshToken:" + userInfo.getUserId(), refreshToken, 7, TimeUnit.DAYS);
+
         userInfo.setAccessToken(accessToken);
 
-        return userInfo;
+        return new A001SignInResult(userInfo, refreshToken);
     }
 
     @Transactional
@@ -62,17 +76,14 @@ public class A001SignInAndRegisterService {
 
         String encodedPassword = passwordEncoder.encode(a001RegDto.getPassword());
 
-        int insertedUserRows =
-                a001SignInAndRegisterMapper.registerUser(
-                        a001RegDto,
-                        encodedPassword
-                );
+        int insertedUserRows = a001SignInAndRegisterMapper.registerUser(
+                a001RegDto,
+                encodedPassword);
 
         if (insertedUserRows != 1) {
             throw new BusinessException(
                     500,
-                    "ユーザーの登録に失敗しました"
-            );
+                    "ユーザーの登録に失敗しました");
         }
 
         Integer userId = a001RegDto.getUserId();
@@ -80,28 +91,71 @@ public class A001SignInAndRegisterService {
         if (userId == null) {
             throw new BusinessException(
                     500,
-                    "ユーザーIDの取得に失敗しました"
-            );
+                    "ユーザーIDの取得に失敗しました");
         }
 
-        int insertedSettingsRows =
-                a001SignInAndRegisterMapper.registerUserSettings(
-                        userId,
-                        a001RegDto.getFontSize(),
-                        a001RegDto.getBackgroundColor()
-                );
+        int insertedSettingsRows = a001SignInAndRegisterMapper.registerUserSettings(
+                userId,
+                a001RegDto.getFontSize(),
+                a001RegDto.getBackgroundColor());
 
         if (insertedSettingsRows != 1) {
             throw new BusinessException(
                     500,
-                    "ユーザー設定の登録に失敗しました"
-            );
+                    "ユーザー設定の登録に失敗しました");
         }
 
-        return a001SignInAndRegisterMapper.getUserSettings(a001RegDto.getUsername());
+        String accessToken = generateAccessToken(userId.toString());
+
+        A001LogInListBean userInfo = a001SignInAndRegisterMapper.getUserSettings(a001RegDto.getUsername());
+
+        userInfo.setAccessToken(accessToken);
+
+        return userInfo;
     }
 
-    public A001LogInListBean reSignIn(int userId) {
+    public A001LogInListBean getUserInfoByAccessToken(int userId) {
         return a001SignInAndRegisterMapper.getUserSettingsById(userId);
     }
+
+    public A001ReissueToken refresh(String refreshToken) {
+
+        if (refreshToken == null || refreshToken.isBlank()) {
+            return null;
+        }
+
+        Integer userId = jwtUtil.getUserIdFromRefreshToken(refreshToken);
+
+        String currentRefreshToken = stringRedisTemplate.opsForValue().get("refreshToken:" + userId);
+
+        if (currentRefreshToken == null) {
+            return null;
+        }
+
+        if (!currentRefreshToken.equals(refreshToken)) {
+            throw new BusinessException(
+                    401,
+                    "不正なリフレッシュトークン");
+        }
+
+        long expirationTime = stringRedisTemplate.getExpire("refreshToken:" + userId, TimeUnit.SECONDS);
+
+        String newRefreshToken = null;
+
+        if (expirationTime <= 24 * 60 * 60) {
+            newRefreshToken = generateRefreshToken(userId.toString());
+
+            stringRedisTemplate.opsForValue().set("refreshToken:" + userId, newRefreshToken, 7, TimeUnit.DAYS);
+        }
+
+        String accessToken = generateAccessToken(userId.toString());
+
+        return new A001ReissueToken(newRefreshToken, accessToken);
+    }
+
+    public void signOut(String userId) {
+
+        stringRedisTemplate.delete("refreshToken:" + userId);
+    }
+
 }

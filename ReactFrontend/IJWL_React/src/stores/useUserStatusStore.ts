@@ -62,6 +62,8 @@ export const useUserStatusStore = create<UserStatusStore>()(
       name: 'userStatusStore',
       partialize: (state) => ({
         accessToken: state.accessToken,
+        avatar: state.avatar,
+        darkMode: state.darkMode,
       })
     }
   )

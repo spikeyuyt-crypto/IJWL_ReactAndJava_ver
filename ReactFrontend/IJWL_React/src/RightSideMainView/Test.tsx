@@ -73,46 +73,56 @@ export default function Test() {
     }
 
     function judgeAnswer(currentWordIndex: number) {
-        currentTestItem.answer.trim() === testItemList[currentWordIndex].testWord.japanese 
-        ? setJudge(currentWordIndex, true)
-        : setJudge(currentWordIndex, false);
+        currentTestItem.answer.trim() === testItemList[currentWordIndex].testWord.japanese
+            ? setJudge(currentWordIndex, true)
+            : setJudge(currentWordIndex, false);
     }
 
     function getLocalDateTimeString(): string {
-    const now = new Date();
+        const now = new Date();
 
-    return new Date(
-        now.getTime() - now.getTimezoneOffset() * 60_000
-    )
-        .toISOString()
-        .slice(0, 19);
-}
+        return new Date(
+            now.getTime() - now.getTimezoneOffset() * 60_000
+        )
+            .toISOString()
+            .slice(0, 19);
+    }
 
     return (
         <>
-            <p>{currentTestItem.testWord.chinese}</p>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+                <p
+                    style={{ fontSize: "50px", fontWeight: "bold" }}>{currentTestItem.testWord.chinese}</p>
 
-            <Input variant="outlined" value={testItemList[currentWordIndex].answer}
-                onChange={(event) => {
-                    setAnswer(currentWordIndex, event.target.value);
-                }} />
-
-            <Button onClick={() => { setCurrentWordIndex(previousIndex => previousIndex - 1) }}
-                disabled={currentWordIndex === 0}>前に戻る</Button>
-
-            {currentWordIndex === testItemList.length - 1
-                ? <Button type="primary" onClick={() => {
-                    judgeAnswer(currentWordIndex);
-                    setEndedAt(getLocalDateTimeString());
-                    navigate("/testresult", { replace: true });
-                }}>終了</Button>
-
-                : <Button type="primary"
-                    onClick={() => {
-                        judgeAnswer(currentWordIndex);
-                        setCurrentWordIndex(previousIndex => previousIndex + 1)
+                <Input variant="outlined"
+                    value={testItemList[currentWordIndex].answer}
+                    onChange={(event) => {
+                        setAnswer(currentWordIndex, event.target.value);
                     }}
-                    disabled={currentWordIndex === testItemList.length - 1}>次へ</Button>}
+                    style={{ marginTop: "20px", width: "150px",transform: "scale(1.5)" }} />
+
+                <div style={{ display: "flex", justifyContent: "center", marginTop: "100px" }}>
+                    <Button onClick={() => { setCurrentWordIndex(previousIndex => previousIndex - 1) }}
+                        disabled={currentWordIndex === 0}
+                        style={{ marginTop: "20px", transform: "scale(1.2)", width: "100px", marginRight: "40px" }}>前に戻る</Button>
+
+                    {currentWordIndex === testItemList.length - 1
+                        ? <Button type="primary" onClick={() => {
+                            judgeAnswer(currentWordIndex);
+                            setEndedAt(getLocalDateTimeString());
+                            navigate("/testresult", { replace: true });
+                        }}
+                            style={{ marginTop: "20px", transform: "scale(1.2)", width: "100px" }}>終了</Button>
+
+                        : <Button type="primary"
+                            onClick={() => {
+                                judgeAnswer(currentWordIndex);
+                                setCurrentWordIndex(previousIndex => previousIndex + 1)
+                            }}
+                            disabled={currentWordIndex === testItemList.length - 1}
+                            style={{ marginTop: "20px", transform: "scale(1.2)", width: "100px" }}>次へ</Button>}
+                </div>
+            </div>
         </>
     )
 }

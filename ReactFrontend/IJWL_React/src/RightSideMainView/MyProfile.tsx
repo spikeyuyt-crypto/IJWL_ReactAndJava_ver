@@ -133,6 +133,16 @@ export default function MyProfile() {
         }
     }
 
+    async function logoutUser() {
+        try {
+            await axiosInstance.post('/users/signOut');
+            messageApi.success('ログアウトしました');
+            useUserStatusStore.getState().logout();
+        } catch (error) {
+            messageApi.error('ログアウトに失敗しました');
+        }
+    }
+
 
     return (
         <>
@@ -245,7 +255,7 @@ export default function MyProfile() {
                         okText="はい"
                         cancelText="いいえ"
                         onConfirm={() => {
-                            useUserStatusStore.getState().logout();
+                            logoutUser();
                             setTimeout(() => {
                                 navigate('/');
                             }, 500);

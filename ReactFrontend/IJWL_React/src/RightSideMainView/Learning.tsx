@@ -1,10 +1,14 @@
-import { message } from "antd";
+import { message, Tooltip } from "antd";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUserStatusStore } from "../stores/useUserStatusStore";
 import { useWordListStatusStore } from "../stores/useWordListStatusStore";
 import { Button, Modal, Checkbox } from 'antd';
 import axiosInstance from "../NetWork/axiosInstance";
+import { VscOpenPreview } from "react-icons/vsc";
+import { HiOutlineClipboardDocumentCheck } from "react-icons/hi2";
+import { MdExitToApp } from "react-icons/md";
+
 
 export default function Learning() {
 
@@ -131,10 +135,14 @@ export default function Learning() {
     return (
         <>
             <div style={{
-                display: 'flex', flexDirection: 'column'
-                , justifyContent: 'center', alignItems: 'center'
+                display: 'flex', flexDirection: 'row',
+                alignItems: 'center', justifyContent: 'center',
             }}>
-                <div>
+
+                <div style={{
+                    display: 'flex', flexDirection: 'column',
+                    justifyContent: 'center', alignItems: 'center', width: "40vw"
+                }}>
                     <p
                         style={{ fontSize: 50 }}>
                         {displayWordList[currentWordIndex].chinese}
@@ -145,28 +153,63 @@ export default function Learning() {
                     }}>
                         {displayWordList[currentWordIndex].japanese}
                     </p>
-
-                    <Button type="primary" onClick={() => setShowJapanese(!showJapanese)}
-                        disabled={displayWordList[currentWordIndex].japanese === ""}>答えを見る</Button>
-
-                    <Button type="primary" onClick={() => markWord(displayWordList[currentWordIndex].wordId, currentUserId)}
-                        disabled={displayWordList === blankWordList}>この単語をマークする</Button>
-
-                    <Button type="primary" onClick={() => navigate('/wordlist')}>単語リストへ</Button>
-
+                    <div style={{
+                        display: 'flex', flexDirection: 'row', justifyContent: 'space-between',
+                        marginTop: "40px"
+                    }}>
+                        <Button type="primary" onClick={() => { setCurrentWordIndex((previous) => previous - 1) }}
+                            disabled={currentWordIndex === 0}
+                            style={{ width: "100px", marginRight: "60px", transform: "scale(1.3)" }}>
+                            前に戻る
+                        </Button>
+                        <Button type="primary" onClick={() => setShowJapanese(!showJapanese)}
+                            disabled={displayWordList[currentWordIndex].japanese === ""}
+                            style={{ width: "100px", marginRight: "60px", transform: "scale(1.3)" }}>答えを見る</Button>
+                        <Button type="primary" onClick={() => {
+                            setShowJapanese(false);
+                            setCurrentWordIndex((previous) => previous + 1)
+                        }}
+                            disabled={currentWordIndex >= displayWordList.length - 1}
+                            style={{ width: "100px", transform: "scale(1.3)" }}>
+                            次へ
+                        </Button>
+                    </div>
+                </div>
+                <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-around',
+                    alignItems: 'center',
+                    height: '70vh',    
+                }}>
+                    <Tooltip title="範囲選択" placement="top">
+                        <Button
+                            type="primary"
+                            shape="circle"
+                            style={{ width: "60px", height: "60px", transform: "scale(1.2)" }}
+                            onClick={() => { openScopeChoosingModal() }}
+                            icon={<VscOpenPreview size={30} />}>
+                        </Button>
+                    </Tooltip>
+                    <Tooltip title="この単語をマークする" placement="top">
+                        <Button type="primary" onClick={() => markWord(displayWordList[currentWordIndex].wordId, currentUserId)}
+                            disabled={displayWordList === blankWordList}
+                            shape="circle"
+                            style={{ width: "60px", height: "60px", transform: "scale(1.2)" }}
+                            icon={<HiOutlineClipboardDocumentCheck size={30} />}>
+                        </Button>
+                    </Tooltip>
+                    <Tooltip title="単語リストへ" placement="top">
+                        <Button
+                            type="primary"
+                            onClick={() => navigate('/wordlist')}
+                            shape="circle"
+                            style={{ width: "60px", height: "60px", transform: "scale(1.2)" }}
+                            icon={<MdExitToApp size={30} />}>
+                        </Button>
+                    </Tooltip>
                     {contextHolder}
                     {modalHolder}
-                </div>
-                <div>
-                    <Button type="primary" onClick={() => { openScopeChoosingModal() }}>範囲選択</Button>
-                    <Button type="primary" onClick={() => { setCurrentWordIndex((previous) => previous - 1) }}
-                        disabled={currentWordIndex === 0}>
-                        前に戻る
-                    </Button>
-                    <Button type="primary" onClick={() => { setCurrentWordIndex((previous) => previous + 1) }}
-                        disabled={currentWordIndex >= displayWordList.length - 1}>
-                        次へ
-                    </Button>
                 </div>
             </div>
         </>
