@@ -6,5 +6,5 @@ import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface A003SettingsMapper {
-    int updateSettings(@Param("dto") A003SettingsDto dto,@Param("userId") Integer userId);
+    int updateSettings(@Param("dto") A003SettingsDto dto, @Param("userId") Integer userId);
 }

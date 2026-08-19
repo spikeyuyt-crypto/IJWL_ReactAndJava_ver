@@ -67,7 +67,7 @@ public class A001SignInAndRegisterService {
     }
 
     @Transactional
-    public A001LogInListBean register(A001RegDto a001RegDto) {
+    public A001SignInResult register(A001RegDto a001RegDto) {
         boolean usernameExists = a001SignInAndRegisterMapper.checkUsername(a001RegDto.getUsername());
 
         if (usernameExists) {
@@ -107,11 +107,15 @@ public class A001SignInAndRegisterService {
 
         String accessToken = generateAccessToken(userId.toString());
 
+        String refreshToken = generateRefreshToken(userId.toString());
+
+        stringRedisTemplate.opsForValue().set("refreshToken:" + userId, refreshToken, 7, TimeUnit.DAYS);
+
         A001LogInListBean userInfo = a001SignInAndRegisterMapper.getUserSettings(a001RegDto.getUsername());
 
         userInfo.setAccessToken(accessToken);
 
-        return userInfo;
+        return new A001SignInResult(userInfo, refreshToken);
     }
 
     public A001LogInListBean getUserInfoByAccessToken(int userId) {

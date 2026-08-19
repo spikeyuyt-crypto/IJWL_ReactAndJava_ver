@@ -30,8 +30,6 @@ public class A003SettingsController {
         return ResponseEntity.ok(
                 new ApiResponse<>(
                         "設定更新成功",
-                        null
-                )
-        );
+                        null));
     }
 }

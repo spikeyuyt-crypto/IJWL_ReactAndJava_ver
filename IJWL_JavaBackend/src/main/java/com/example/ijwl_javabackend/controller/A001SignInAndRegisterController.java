@@ -8,7 +8,6 @@ import com.example.ijwl_javabackend.entity.dto.A001SignInResult;
 import com.example.ijwl_javabackend.service.A001SignInAndRegisterService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -68,12 +67,30 @@ public class A001SignInAndRegisterController {
         @PostMapping("/register")
         public ResponseEntity<ApiResponse<A001LogInListBean>> register(
                         @RequestBody A001RegDto a001RegDto) {
-                A001LogInListBean userSettings = a001SignInAndRegisterService.register(
+                A001SignInResult result = a001SignInAndRegisterService.register(
                                 a001RegDto);
-                return ResponseEntity.ok(
-                                new ApiResponse<>(
-                                                "success",
-                                                userSettings));
+
+                A001LogInListBean userSettings = result.getUserInfo();
+
+                String newRefreshToken = result.getRefreshToken();
+
+                ResponseCookie refreshCookie = ResponseCookie
+                                .from("refreshToken", newRefreshToken)
+                                .httpOnly(true)
+                                .secure(false)
+                                .path("/")
+                                .maxAge(Duration.ofDays(7))
+                                .sameSite("Lax")
+                                .build();
+
+                ResponseEntity.BodyBuilder response = ResponseEntity.ok();
+
+                return response
+                                .header("Set-Cookie", refreshCookie.toString())
+                                .body(
+                                                new ApiResponse<>(
+                                                                "success",
+                                                                userSettings));
         }
 
         @PostMapping("/refresh")

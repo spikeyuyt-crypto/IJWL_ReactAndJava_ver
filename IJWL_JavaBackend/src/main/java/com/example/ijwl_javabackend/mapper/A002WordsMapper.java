@@ -21,19 +21,20 @@ public interface A002WordsMapper {
     List<A002GetSearchingWordBean> searchWord(String word);
 
     int markWord(@Param("insertTargets") List<A002MarkWordDto> insertTargets,
-                 @Param("userId") int userId);
+            @Param("userId") int userId);
 
     String getComment(@Param("a002GetCommentDto") A002GetCommentDto a002GetCommentDto,
-                      @Param("userId") int userId);
+            @Param("userId") int userId);
 
     int updateComment(@Param("a002UpdateCommentDto") A002UpdateCommentDto a002UpdateCommentDto,
-                      @Param("userId") int userId);
+            @Param("userId") int userId);
 
     int unmarkWord(@Param("a002UnmarkAndDeleteWordDto") List<A002UnmarkAndDeleteWordDto> a002UnmarkAndDeleteWordDto,
-                   @Param("userId") int userId);
+            @Param("userId") int userId);
 
-    int deleteBatsuWord(@Param("a002UnmarkAndDeleteWordDto") List<A002UnmarkAndDeleteWordDto> a002UnmarkAndDeleteWordDto,
-                        @Param("userId") Integer userId);
+    int deleteBatsuWord(
+            @Param("a002UnmarkAndDeleteWordDto") List<A002UnmarkAndDeleteWordDto> a002UnmarkAndDeleteWordDto,
+            @Param("userId") Integer userId);
 
     int recordBatsuWord(List<A002RecordBatsuWordDto> insertTargets, @Param("userId") int userId);
 }
