@@ -1,0 +1,56 @@
+services:
+  frontend:
+    build: 
+      context: ReactFrontend/IJWL_React
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+  backend:
+    build:
+      context: IJWL_JavaBackend
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/it_japanese_learning_system?useSSL=false&serverTimezone=Asia/Tokyo&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+
+      SPRING_DATA_REDIS_HOST: redis-db
+      SPRING_DATA_REDIS_PORT: 6379
+
+      JWT_SECRET: ${IJWL_TOKEN}
+      JWT_REFRESH_SECRET: ${IJWL_REFRESH_TOKEN}
+
+    depends_on:
+      - mysql-db
+      - redis-db
+
+  mysql-db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_DATABASE: it_japanese_learning_system
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  redis-db:
+    image: redis:alpine
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+
+volumes:
+  mysql-data:
+   external: true
+   name: ijwl_javabackend_mysql-data
+
+  redis-data:
+    external: true
+    name: ijwl_javabackend_redis-data

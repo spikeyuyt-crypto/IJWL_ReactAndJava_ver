@@ -1,4 +1,4 @@
-import { Avatar, Modal, Button, Popconfirm, BorderBeam, message } from "antd";
+import { Avatar, Modal, Button, Popconfirm, BorderBeam, message, Typography } from "antd";
 import { useNavigate } from "react-router-dom";
 import { useUserStatusStore, type AvatarType } from "../stores/useUserStatusStore";
 import { avatarIconMap } from "../screens/Home.tsx";
@@ -198,7 +198,10 @@ export default function MyProfile() {
                         selectedItem={temporaryAvatar}
                         onSelect={setTemporaryAvatar}
                         renderItem={(fontKey) => (
-                            <Avatar></Avatar>
+                            <Avatar>
+                                <Typography.Title>{temporaryFont}</Typography.Title>
+                                <Typography.Text>{fontKey}</Typography.Text>
+                            </Avatar>
                         )}
                     />
                 </Modal>

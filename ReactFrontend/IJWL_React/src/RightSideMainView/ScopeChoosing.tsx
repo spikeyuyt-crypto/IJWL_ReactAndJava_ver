@@ -1,4 +1,4 @@
-import { Button, Checkbox, Modal, message, Card } from "antd";
+import { Checkbox, Modal, message, Card } from "antd";
 import { useNavigate } from "react-router-dom";
 import { useWordListStatusStore } from "../stores/useWordListStatusStore";
 

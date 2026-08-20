@@ -51,7 +51,7 @@ export default function TestHistory() {
                 <YAxis domain={[0, 100]} />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="score" fill= {themeColor} activeBar={{ fill: 'pink', stroke: 'blue' }} radius={[10, 10, 0, 0]} />
+                <Bar dataKey="score" fill= {themeColor} activeBar={{ fill: 'pink', stroke: 'blue' }} radius={[20, 20, 0, 0]} />
             </BarChart>)
     }
 

@@ -8,4 +8,4 @@ FROM eclipse-temurin:17-jre
 WORKDIR /IJWL_JavaBackend
 COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "IJWL_JavaBackend-0.0.1-SNAPSHOT.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]

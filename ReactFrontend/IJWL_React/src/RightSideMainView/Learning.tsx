@@ -1,4 +1,4 @@
-import { message, Tooltip } from "antd";
+import { message, Tooltip, FloatButton } from "antd";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUserStatusStore } from "../stores/useUserStatusStore";
@@ -8,6 +8,7 @@ import axiosInstance from "../NetWork/axiosInstance";
 import { VscOpenPreview } from "react-icons/vsc";
 import { HiOutlineClipboardDocumentCheck } from "react-icons/hi2";
 import { MdExitToApp } from "react-icons/md";
+
 
 
 export default function Learning() {
@@ -175,43 +176,42 @@ export default function Learning() {
                         </Button>
                     </div>
                 </div>
-                <div style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-around',
-                    alignItems: 'center',
-                    height: '70vh',    
-                }}>
+                <FloatButton.Group
+                    style={{
+                        gap: 36,
+                        right: 100,
+                        bottom: 200
+                    }}>
                     <Tooltip title="範囲選択" placement="top">
-                        <Button
+                        <FloatButton
                             type="primary"
                             shape="circle"
-                            style={{ width: "60px", height: "60px", transform: "scale(1.2)" }}
+                            style={{ width: "60px", height: "60px", transform: "scale(1.2)", marginBottom:"60px" }}
                             onClick={() => { openScopeChoosingModal() }}
                             icon={<VscOpenPreview size={30} />}>
-                        </Button>
+                        </FloatButton>
                     </Tooltip>
                     <Tooltip title="この単語をマークする" placement="top">
-                        <Button type="primary" onClick={() => markWord(displayWordList[currentWordIndex].wordId, currentUserId)}
+                        <FloatButton type="primary" onClick={() => markWord(displayWordList[currentWordIndex].wordId, currentUserId)}
                             disabled={displayWordList === blankWordList}
                             shape="circle"
-                            style={{ width: "60px", height: "60px", transform: "scale(1.2)" }}
+                            style={{ width: "60px", height: "60px", transform: "scale(1.2)", marginBottom:"60px" }}
                             icon={<HiOutlineClipboardDocumentCheck size={30} />}>
-                        </Button>
+                        </FloatButton>
                     </Tooltip>
                     <Tooltip title="単語リストへ" placement="top">
-                        <Button
+                        <FloatButton
                             type="primary"
                             onClick={() => navigate('/wordlist')}
                             shape="circle"
                             style={{ width: "60px", height: "60px", transform: "scale(1.2)" }}
                             icon={<MdExitToApp size={30} />}>
-                        </Button>
+                        </FloatButton>
                     </Tooltip>
                     {contextHolder}
                     {modalHolder}
-                </div>
-            </div>
+                </FloatButton.Group>
+            </div >
         </>
     )
 }

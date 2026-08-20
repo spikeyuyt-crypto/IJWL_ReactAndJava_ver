@@ -5,7 +5,6 @@ import com.example.ijwl_javabackend.entity.dto.A003SettingsDto;
 import com.example.ijwl_javabackend.service.A003SettingsService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

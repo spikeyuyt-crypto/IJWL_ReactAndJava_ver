@@ -4,7 +4,6 @@ import com.example.ijwl_javabackend.entity.A004RecordTestResponse;
 import com.example.ijwl_javabackend.entity.A004ShowTestScoreListBean;
 import com.example.ijwl_javabackend.entity.ApiResponse;
 import com.example.ijwl_javabackend.entity.dto.A004TestDto;
-import com.example.ijwl_javabackend.service.A002WordsService;
 import com.example.ijwl_javabackend.service.A004TestService;
 import jakarta.servlet.http.HttpServletRequest;
 
