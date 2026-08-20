@@ -4,6 +4,7 @@ import { Button, Divider, Form, Input, message, theme } from 'antd';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useUserStatusStore } from '../stores/useUserStatusStore';
+import { publicAxiosInstance } from '../NetWork/axiosInstance';
 
 type FieldType = {
     username?: string;
@@ -30,13 +31,12 @@ const Login: React.FC = () => {
     const onFinish: FormProps<FieldType>['onFinish'] = (values) => {
         async function login() {
             try {
-                const response = await axios.post('http://localhost:8080/users/signIn',
+                const response = await publicAxiosInstance.post('/users/signIn',
                     values,
                     {
                         headers: {
                             'Content-Type': 'application/json',
-                        },
-                        withCredentials: true
+                        }
                     }
                 );
 

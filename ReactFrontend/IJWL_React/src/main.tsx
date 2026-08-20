@@ -7,7 +7,7 @@ import router from './router/index';
 import { useUserStatusStore } from './stores/useUserStatusStore';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-import axiosInstance from './NetWork/axiosInstance';
+import axiosInstance, { publicAxiosInstance } from './NetWork/axiosInstance';
 
 const themeColorMap: Record<string, string> = {
   violet: '#7C3AED',
@@ -34,13 +34,7 @@ function AuthInitializer() {
 
         let currentAccessToken = accessToken;
         if (!currentAccessToken) {
-          const refreshResponse = await axios.post(
-            'http://localhost:8080/users/refresh',
-            {},
-            {
-              withCredentials: true,
-            }
-          );
+          const refreshResponse = await publicAxiosInstance.post('/users/refresh');
           
           currentAccessToken = refreshResponse.data.data;
 

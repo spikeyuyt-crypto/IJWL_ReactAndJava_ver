@@ -37,6 +37,7 @@ services:
       - "3307:3306"
     volumes:
       - mysql-data:/var/lib/mysql
+      - ./database/init:/docker-entrypoint-initdb.d:ro
 
   redis-db:
     image: redis:alpine
@@ -48,9 +49,4 @@ services:
 
 volumes:
   mysql-data:
-   external: true
-   name: ijwl_javabackend_mysql-data
-
   redis-data:
-    external: true
-    name: ijwl_javabackend_redis-data

@@ -4,6 +4,7 @@ import { Button, Divider, Form, Input, message, theme } from 'antd';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useUserStatusStore } from '../stores/useUserStatusStore';
+import { publicAxiosInstance } from '../NetWork/axiosInstance';
 
 type FieldType = {
     username?: string;
@@ -33,13 +34,12 @@ const Register: React.FC = () => {
             };
 
             try {
-                const response = await axios.post('http://localhost:8080/users/register',
+                const response = await publicAxiosInstance.post('/users/register',
                     requestData,
                     {
                         headers: {
                             'Content-Type': 'application/json',
-                        },
-                        withCredentials: true
+                        }
                     }
                 );
 

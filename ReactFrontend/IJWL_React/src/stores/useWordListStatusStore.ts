@@ -1,5 +1,5 @@
-import axios from "axios"; 
 import { create } from "zustand";
+import axiosInstance from "../NetWork/axiosInstance";
 
 export enum WordListStatus {
     default = "default",
@@ -70,8 +70,8 @@ export const useWordListStatusStore =
                     unitNumbers,
                 });
 
-                const response = await axios.post<GetWordsApiResponse>(
-                    "http://localhost:8080/word/getAllWords",
+                const response = await axiosInstance.post<GetWordsApiResponse>(
+                    "/word/getAllWords",
                     {
                         unitNumbers: unitNumbers.map(String),
                     },

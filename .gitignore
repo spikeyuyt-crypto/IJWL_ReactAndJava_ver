@@ -1,0 +1,3 @@
+# Local database snapshots can contain user data and password hashes.
+database/init/*.sql
+!database/init/.gitkeep

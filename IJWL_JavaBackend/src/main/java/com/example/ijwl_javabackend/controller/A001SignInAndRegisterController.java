@@ -34,7 +34,7 @@ public class A001SignInAndRegisterController {
 
                 ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", result.getRefreshToken())
                                 .httpOnly(true)
-                                .secure(false)
+                                .secure(true)
                                 .path("/")
                                 .maxAge(Duration.ofDays(7))
                                 .sameSite("Lax")
@@ -77,7 +77,7 @@ public class A001SignInAndRegisterController {
                 ResponseCookie refreshCookie = ResponseCookie
                                 .from("refreshToken", newRefreshToken)
                                 .httpOnly(true)
-                                .secure(false)
+                                .secure(true)
                                 .path("/")
                                 .maxAge(Duration.ofDays(7))
                                 .sameSite("Lax")
@@ -111,7 +111,7 @@ public class A001SignInAndRegisterController {
                 if (result.getRefreshToken() != null) {
                         ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", result.getRefreshToken())
                                         .httpOnly(true)
-                                        .secure(false)
+                                        .secure(true)
                                         .path("/")
                                         .maxAge(Duration.ofDays(7))
                                         .sameSite("Lax")
@@ -135,7 +135,7 @@ public class A001SignInAndRegisterController {
 
                 ResponseCookie cookie = ResponseCookie.from("refreshToken", "")
                                 .httpOnly(true)
-                                .secure(false)
+                                .secure(true)
                                 .path("/")
                                 .maxAge(0)
                                 .build();

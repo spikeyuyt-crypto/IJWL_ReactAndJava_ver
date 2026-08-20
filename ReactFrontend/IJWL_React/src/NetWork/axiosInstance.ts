@@ -1,8 +1,15 @@
 import axios from 'axios';
 import { useUserStatusStore } from '../stores/useUserStatusStore';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '/api';
+
+export const publicAxiosInstance = axios.create({
+  baseURL: API_BASE_URL,
+  withCredentials: true,
+});
+
 const axiosInstance = axios.create({
-  baseURL: 'http://localhost:8080',
+  baseURL: API_BASE_URL,
   withCredentials: true,
 });
 
@@ -24,7 +31,7 @@ axiosInstance.interceptors.response.use(
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
-        const response = await axios.post('http://localhost:8080/users/refresh', {}, { withCredentials: true });
+        const response = await publicAxiosInstance.post('/users/refresh');
 
         const newAccessToken = response.data.data;
 
@@ -38,6 +45,8 @@ axiosInstance.interceptors.response.use(
         return Promise.reject(refreshError);
       }
     }
+
+    return Promise.reject(error);
   }
 )
 
